@@ -23,7 +23,7 @@ def verify(username, password):
         print('The login failed')
         return 1
     mysql = MyPymysql()
-    sql = "select password from user where username = %s"
+    sql = "select password from user where username = %s;"
     temp = mysql.getOne(sql, [username])
     temp = temp[0]
     if debug:

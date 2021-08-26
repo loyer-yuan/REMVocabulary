@@ -43,6 +43,7 @@ def login(request):
     elif request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')
+        # 查询
         result = verify(username, password)
         if result == 0:
             request.session['username'] = username

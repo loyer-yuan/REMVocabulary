@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
 import pymysql
-# from pymysql.cursors import DictCursor
-# from DBUtils.PooledDB import PooledDB
+from pymysql.cursors import DictCursor
+from DBUtils.PooledDB import PooledDB
 
 """
 由于使用了django，而它自带的ORM不好用，学习成本太高，因此，自己写了一个，从网上的数据库连接池修改。
@@ -23,11 +23,12 @@ class MyPymysql(BasePymysql):
     MYSQL数据库对象，负责产生数据库连接 , 此类中的连接采用单次连接，实现获取连接对象
     """
     # 连接池对象（暂时不需要）
-    # __pool = None
+    __pool = None
 
-    def __init__(self):
+    def __init__(self, usePool=False):
         super(MyPymysql, self).__init__()
         # 数据库构造函数，从连接池中取出连接，并生成操作游标
+        self.usePool = usePool
         self._conn = self.__getConn()
         self._cursor = self._conn.cursor()
 
@@ -36,21 +37,23 @@ class MyPymysql(BasePymysql):
         @summary: 静态方法，从连接池中取出连接
         @return MySQLdb.connection
         """
-        # if MyPymysqlPool.__pool is None:
-        #     __pool = PooledDB(creator=pymysql,
-        #                       mincached=1,
-        #                       maxcached=20,
-        #                       host=self.db_host,
-        #                       port=self.db_port,
-        #                       user=self.user,
-        #                       passwd=self.password,
-        #                       db=self.db,
-        #                       use_unicode=False,
-        #                       charset="utf8",
-        #                       cursorclass=DictCursor)
-        # return __pool.connection()
-        conn = pymysql.connect(host=self.db_host, user=self.user, password=self.password, database=self.db)
-        return conn
+        if self.usePool:
+            if MyPymysql.__pool is None:
+                __pool = PooledDB(creator=pymysql,
+                                  mincached=1,
+                                  maxcached=20,
+                                  host=self.db_host,
+                                  port=self.db_port,
+                                  user=self.user,
+                                  passwd=self.password,
+                                  db=self.db,
+                                  use_unicode=False,
+                                  charset="utf8",
+                                  cursorclass=DictCursor)
+            return __pool.connection()
+        else:
+            conn = pymysql.connect(host=self.db_host, user=self.user, password=self.password, database=self.db)
+            return conn
 
     def getAll(self, sql, param=None):
         """
