@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}学英语{% endblock title %}</title>
+</head>
+<body>
+<header>
+    <div><h1>学英语</h1></div>
+    <div>欢迎登录，{{ username }}<a href="{% url 'logout' %}">注销</a></div>
+</header>
+{% block content %}
+    <p>这是主体内容可以被子模板重写</p>
+{% endblock content %}
+<footer>
+    <div><a href="">背词</a></div>
+    <div><a href="">选词</a></div>
+    <div><a href="">统计</a></div>
+    <div><a href="">设置</a></div>
+</footer>
+</body>
+</html>
