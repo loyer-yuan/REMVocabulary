@@ -95,7 +95,7 @@ if __name__ == '__main__':
     mysql = MyPymysql()
     key = False
     sql = 'select word from enwords;'
-    # 获取外面单词库的单词
+    # 获取外面单词库的单词 TODO:可以更改为其他单词的获取源
     wordList = mysql.getAll(sql)
     # 插入的sql语句
     sql_vocabulary = 'insert into vocabulary(words, part_of_speech, chinese) values ' \
@@ -108,9 +108,14 @@ if __name__ == '__main__':
     for w in wordList:
         w = w[0]
         print("执行查找 " + w)
-        if mysql.getOne('select 1 from vocabulary where words = %s', w):
-            count += 1
-            print("数据库已有"+w+"，跳过该单词")
+        ad = mysql.getOne('select 1 from vocabulary where words = %s;', w)
+        bd = mysql.getOne('select 1 from not_found where word = %s;', w)
+        if ad or bd:
+            if ad:
+                count += 1
+            else:
+                error += 1
+            print("数据库已有" + w + "，跳过该单词")
             continue
         # 遍历之前的已经存在在数据库中的数据不需要sleep
         if key:
@@ -143,10 +148,13 @@ if __name__ == '__main__':
                 count += 1
             except:
                 error += 1
-                mysql.end(option='0')
-            print("结束插入 " + w + "\t录入：" + str(count) + "\t错误：" + str(error) + "\t进度为： " + str((count + error) / 103976 * 100) + "%")
+                mysql.end(option='rollback')
+            print("结束插入 " + w + "\t录入：" + str(count) + "\t错误：" + str(error) + "\t进度为： " + str(
+                (count + error) / 103976 * 100) + "%")
         else:
             error += 1
-            print("找不到单词" + w + "\t录入：" + str(count) + "\t错误：" + str(error) + "\t进度为： " + str((count + error) / 103976 * 100) + "%")
+            num = mysql.insert('insert into not_found (word) values (%s);', [w])
+            print("找不到单词" + w + "\t录入：" + str(count) + "\t错误：" + str(error) + "\t进度为： " + str(
+                (count + error) / 103976 * 100) + "%")
     mysql.dispose()
     print("Finish fulfill the db of vocabulary")

@@ -1,0 +1,22 @@
+{% extends 'login.html' %}
+{% block title %}
+    注册账号 -学英语
+{% endblock title %}
+{% block main %}
+    <h1>注册</h1>
+    <form action="/register/" method="post">
+        <div>
+            {% csrf_token %}
+            <label>注册邮箱</label>
+            <input type="text" autocomplete="off" maxlength="32" autofocus="autofocus" name="username" required>
+            <label>密码</label>
+            <input type="password" autocomplete="off" maxlength="32" name="password" required>
+            <label>再次输入密码</label>
+            <input type="password" autocomplete="off" maxlength="32" name="repeat_password" required>
+            <span>{{ error }}</span>
+        </div>
+        <div>
+            <input type="submit" value="注册">
+        </div>
+    </form>
+{% endblock main %}

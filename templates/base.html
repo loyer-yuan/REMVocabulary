@@ -7,7 +7,7 @@
 <body>
 <header>
     <div><h1>学英语</h1></div>
-    <div>欢迎登录，{{ username }}<a href="{% url 'logout' %}">注销</a></div>
+    <div>欢迎登录，{{ user.alias }}<a href="{% url 'logout' %}">注销</a></div>
 </header>
 {% block content %}
     <p>这是主体内容可以被子模板重写</p>

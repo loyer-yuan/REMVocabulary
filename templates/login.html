@@ -2,10 +2,11 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>登录到学英语 -学英语</title>
+    <title>{% block title %}登录到学英语 -学英语{% endblock title %}</title>
 </head>
 <body>
 <main>
+    {% block main %}
     <h1>登录学英语</h1>
     <form action="/login/" method="post">
         <div>
@@ -19,10 +20,11 @@
         </div>
         <div>
             <input type="submit" value="登录">
-            <a>注册</a>
+            <a href="{% url 'register'%}">注册</a>
             <a>忘记密码</a>
         </div>
     </form>
+    {% endblock main %}
 </main>
 </body>
 </html>

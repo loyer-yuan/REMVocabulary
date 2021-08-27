@@ -52,7 +52,7 @@ class MyPymysql(BasePymysql):
                                   cursorclass=DictCursor)
             return __pool.connection()
         else:
-            conn = pymysql.connect(host=self.db_host, user=self.user, password=self.password, database=self.db)
+            conn = pymysql.connect(host=self.db_host, user=self.user, password=self.password, database=self.db, autocommit=True)
             return conn
 
     def getAll(self, sql, param=None):
@@ -165,6 +165,7 @@ class MyPymysql(BasePymysql):
             self._conn.commit()
         else:
             self._conn.rollback()
+        self._conn.autocommit(1)
 
     def dispose(self, isEnd=1):
         """

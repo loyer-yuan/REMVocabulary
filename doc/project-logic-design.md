@@ -17,6 +17,7 @@
 1. vocabulary (<u>单词</u>， <u>词性</u>， 中文解释)
 2. Example (<u>例句</u>， 单词, 中文翻译)
 3. pronounce (<u>单词</u>， <u>口音</u>， 音频存放的url)
+4. not_found(<u>单词</u>) 注：存放找不到的单词
 
 ## 记忆模块
 1. word-book (<u>单词</u>， <u>单词本</u>， <u>账户名</u>， 记忆程度（not learning， unfamiliar，blur， f1, f2, f4, f7, f15, finished）， 最后更新时间)
