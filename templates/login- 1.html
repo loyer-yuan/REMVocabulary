@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no" >
+    <link href="/static/plugins/bootstrap-5.0.2/css/bootstrap.min.css" rel="stylesheet">
+    <title>{% block title %}登录到学英语 -学英语{% endblock title %}</title>
+</head>
+<body>
+<main>
+    {% block main %}
+    <h1>登录学英语</h1>
+    <form action="/login/" method="post">
+        <div>
+            {% csrf_token %}
+            <label>邮箱</label>
+            <input type="text" autocomplete="off" maxlength="32" autofocus="autofocus" name="username" required>
+            <label>密码</label>
+            <input type="password" autocomplete="off" maxlength="32" name="password" required>
+            <span>{{ error }}</span>
+            <span>记住用户名:<input type="checkbox" name="isSaved"></span>
+        </div>
+        <div>
+            <input type="submit" value="登录">
+            <a href="{% url 'register'%}">注册</a>
+            <a>忘记密码</a>
+        </div>
+    </form>
+    {% endblock main %}
+</main>
+</body>
+</html>

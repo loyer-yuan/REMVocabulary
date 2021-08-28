@@ -142,22 +142,22 @@ def loginDo(user):
                                  'values (%s, %s, %s);', [target[0] + 1, target[1], 1])
             if debug:
                 print("昨天没签到，新建连续签到记录，影响行数：", state)
-    """
-    计算登录前并且为今天之前的遗忘率
-    """
-    if diff > 0:
-        data_oblivion = mysql.getOne("""select username, forget_number, remember_number 
-                                    from oblivion where username = %s;""", [username])
-        # 判断是否非0
-        if data_oblivion[2] == 0:
-            insert_data = 0
-        else:
-            insert_data = data_oblivion[1] / data_oblivion[2]
-        state = mysql.insert("insert into oblivion_rate(username, rate) "
-                             "values (%s, %s);", [data_oblivion[0], insert_data])
-        if debug:
-            print("插入oblivion-rate数据为：username: " + data_oblivion[0]
-                  + "\t遗忘率：" + str(insert_data)
-                  + "\t影响行数为：" + str(state))
+        """
+        计算登录前并且为今天之前的遗忘率
+        """
+        if diff > 0:
+            data_oblivion = mysql.getOne("""select username, forget_number, remember_number 
+                                        from oblivion where username = %s;""", [username])
+            # 判断是否非0
+            if data_oblivion[2] == 0:
+                insert_data = 0
+            else:
+                insert_data = data_oblivion[1] / data_oblivion[2]
+            state = mysql.insert("insert into oblivion_rate(username, rate) "
+                                 "values (%s, %s);", [data_oblivion[0], insert_data])
+            if debug:
+                print("插入oblivion-rate数据为：username: " + data_oblivion[0]
+                      + "\t遗忘率：" + str(insert_data)
+                      + "\t影响行数为：" + str(state))
     mysql.end("commit")
     mysql.dispose()

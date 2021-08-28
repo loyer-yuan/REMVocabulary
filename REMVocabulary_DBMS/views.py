@@ -9,15 +9,6 @@ from REMVocabulary_DBMS.model import *
 debug = True
 
 
-def passes(request):
-    """
-    Just for testing, it doesn't make sense.
-    """
-    t = request.session['username']
-    context = {'hello': t}
-    return render(request, 'pass.html', context)
-
-
 def test(request):
     """
     Show base.html
@@ -52,7 +43,7 @@ def register(request):
         else:  # result is 0
             request.session['user'] = {'username': username,
                                        'alias': username}
-            return HttpResponseRedirect('/login/')  # TODO: return HttpResponseRedirect(首页)
+            return HttpResponseRedirect('/login/')
 
 
 def login(request):
@@ -67,7 +58,7 @@ def login(request):
             # 触发的业务：
             user = request.session['user']
             loginDo(user)
-            return HttpResponseRedirect('/base/')  # TODO: return HttpResponseRedirect(首页)
+            return HttpResponseRedirect('/index/')  # TODO: return HttpResponseRedirect(首页)
         # 2, 然后检查cookie，是否保存了用户登录信息
         if 'user' in request.COOKIES:
             # 若存在则赋值回session，并重定向到首页
@@ -77,7 +68,7 @@ def login(request):
             user = request.session['user']
             loginDo(user)
             request.session['user'] = request.COOKIES['user']
-            return HttpResponseRedirect('/base/')  # TODO: return HttpResponseRedirect(首页)
+            return HttpResponseRedirect('/index/')  # TODO: return HttpResponseRedirect(首页)
         # 不存在则重定向登录页，让用户登录
         return render(request, 'login.html')
     elif request.method == 'POST':
@@ -93,7 +84,7 @@ def login(request):
             # 触发的业务：
             loginDo(user)
             # 检查post 提交的所有键中是否存在 isSaved 键
-            response = HttpResponseRedirect('/base/')  # TODO: return HttpResponseRedirect(首页)
+            response = HttpResponseRedirect('/index/')  # TODO: return HttpResponseRedirect(首页)
             if 'isSaved' in request.POST.keys():
                 # 若存在则说明用户选择了记住用户名功能，执行以下语句设置cookie的过期时间
                 response.set_cookie('username', username, 60 * 60 * 24 * 7)
@@ -127,3 +118,11 @@ def logout(request):
     if debug:
         print("已经退出，删除了session和cookie")
     return resp
+
+
+def indexPage(request):
+    if 'user' not in request.session:
+        return HttpResponseRedirect('/login/')
+    user = request.session['user']
+    context = {'user': user}
+    return render(request, 'index.html', context)
