@@ -22,6 +22,8 @@
 ## 记忆模块
 1. word-book (<u>单词</u>， <u>单词本</u>， <u>账户名</u>， 记忆程度（not learning， unfamiliar，blur， f1, f2, f4, f7, f15, finished）， 最后更新时间)
 2. temp-book (<u>单词</u>， <u>单词本</u>， <u>账户名</u>)
+3. daily_word_number (<u>账户名</u>， 学习单词总量， 更新时间)
+注：直接从remember—word取数据。每次登录更新
 
 每次从数据库取当天要背的单词时，先取出未学习（temp-book）的单词，检查是否达到当天学习的数量。
 如果超出，则截取前面的部分出来。如果不够，继续取到时间复习的陌生的单词；

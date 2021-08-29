@@ -121,8 +121,22 @@ def logout(request):
 
 
 def indexPage(request):
+    """
+    向index传递数据为
+    'user' = {'username': , 'alias': }
+    'data' = {'study_number': {日期；数目} {'study_number_key' 'study_number_data'}
+                ' progress': （str 如：20，0-100）
+                'oblivion_rate': {日期: 遗忘率} {'or_key' 'or_data'}
+                'consecutive_check: '
+                'add_check: '
+                'max_check: '
+                'avg_study: '
+                'avg_preview: '
+               }
+    """
     if 'user' not in request.session:
         return HttpResponseRedirect('/login/')
     user = request.session['user']
-    context = {'user': user}
+    data = getDataOfIndex(user)
+    context = {'user': user, 'data': data}
     return render(request, 'index.html', context)
