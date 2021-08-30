@@ -8,7 +8,7 @@
     <meta name="description" content="DB-design">
     <meta name="author" content="loyer">
 
-    <title>首页 · 学英语</title>
+    <title>学习 · 学英语</title>
 
     <!-- Custom fonts for this template-->
     <link href="../static/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
@@ -175,82 +175,79 @@
                 <div class="container-fluid">
                     <!-- Page Heading -->
                     <div class="d-sm-flex align-items-center justify-content-between mb-4">
-                        <h1 class="h3 mb-0 text-gray-800">数据展示</h1>
+                        <h3 class="h3 mb-0 text-gray-800">学习</h3>
                     </div>
 
-                    <!-- Content Row -->
+                    <!-- 分界线 -->
+                    <hr class="sidebar-divider d-none d-md-block">
+
                     <div class="row">
-                        <!-- Earnings (Monthly) Card Example -->
-                        <div class="col-xl-3 col-md-6 mb-4">
-                            <div class="card border-left-primary shadow h-100 py-2">
-                                <div class="card-body">
-                                    <div class="row no-gutters align-items-center">
-                                        <div class="col mr-2">
-                                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
-                                                连续签到</div>
-                                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ data.consecutive_check }}</div>
+                        <!-- 一开始接触的页面 -->
+                        <div class="col-lg-8">
+                            <!-- 单词 -->
+                            <div class="card shadow mb-4">
+                                <!-- Card Header - Accordion -->
+                                <a href="#collapseCardExample" class="d-block card-header py-3" data-toggle="collapse" role="button" aria-expanded="true" aria-controls="collapseCardExample">
+                                    <h6 class="m-0 font-weight-bold text-primary">单词</h6>
+                                </a>
+                                <!-- Card Content - Collapse -->
+                                <div class="collapse show" id="collapseCardExample" >
+                                    <div class="card-body">
+                                        <h2 class="h2 text-gray-900">hello</h2>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 英文例句 -->
+                            <div class="card shadow mb-4">
+                                <!-- Card Header - Accordion -->
+                                <a href="#collapseCardExample" class="d-block card-header py-3" data-toggle="collapse" role="button" aria-expanded="true" aria-controls="collapseCardExample">
+                                    <h6 class="m-0 font-weight-bold text-primary">例句</h6>
+                                </a>
+                                <!-- Card Content - Collapse -->
+                                <div class="collapse show" id="collapseCardExample" >
+                                    <div class="card-body">
+                                        <div class="card mb-4 py-3 border-left-success">
+                                            <div class="card-body">
+                                                Hello world!
+                                            </div>
                                         </div>
-                                        <div class="col-auto">
-                                            <i class="fas fa-calendar fa-2x text-gray-300"></i>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 选择 -->
+                            <div class="card mb-4">
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-4">
+                                            <input type="submit" class="btn btn-success btn-user btn-block" value="熟悉">
+                                        </div>
+                                        <div class="col-4">
+                                            <input type="submit" class="btn btn-warning btn-user btn-block" value="模糊">
+                                        </div>
+                                        <div class="col-4">
+                                            <input type="submit" class="btn btn-danger btn-user btn-block" value="陌生">
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-
-                        <!-- Earnings (Monthly) Card Example -->
-                        <div class="col-xl-3 col-md-6 mb-4">
-                            <div class="card border-left-success shadow h-100 py-2">
+                        <!-- 放进度条 -->
+                        <div class="col-lg-4">
+                            <div class="card border-bottom-info shadow py-2">
                                 <div class="card-body">
                                     <div class="row no-gutters align-items-center">
                                         <div class="col mr-2">
-                                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
-                                                累计签到</div>
-                                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ data.add_check }}</div>
-                                        </div>
-                                        <div class="col-auto">
-                                            <i class="fas fa-calendar fa-2x text-gray-300"></i>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Earnings (Monthly) Card Example -->
-                        <div class="col-xl-3 col-md-6 mb-4">
-                            <div class="card border-left-warning shadow h-100 py-2">
-                                <div class="card-body">
-                                    <div class="row no-gutters align-items-center">
-                                        <div class="col mr-2">
-                                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
-                                                最大连续</div>
-                                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ data.max_check }}</div>
-                                        </div>
-                                        <div class="col-auto">
-                                            <i class="fas fa-calendar fa-2x text-gray-300"></i>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Earnings (Monthly) Card Example -->
-                        <div class="col-xl-3 col-md-6 mb-4">
-                            <div class="card border-left-info shadow h-100 py-2">
-                                <div class="card-body">
-                                    <div class="row no-gutters align-items-center">
-                                        <div class="col mr-2">
-                                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">背词进度
+                                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">学习进度
                                             </div>
                                             <div class="row no-gutters align-items-center">
                                                 <div class="col-auto">
-                                                    <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800">{{ data.progress }}%</div>
+                                                    <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800">50%</div>
                                                 </div>
                                                 <div class="col">
                                                     <div class="progress progress-sm mr-2">
-                                                        <div class="progress-bar bg-info" role="progressbar"
-                                                            style="width: {{ data.progress }}%" aria-valuenow="50" aria-valuemin="0"
-                                                            aria-valuemax="100"></div>
+                                                        <div class="progress-bar bg-info" role="progressbar" style="width: 50%" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -262,72 +259,241 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <!-- Content Row -->
 
-                    <div class="row">
-
-                        <!-- Area Chart 1 -->
-                        <div class="col-xl-6 col-lg-6">
+                        <!-- 显示详细单词的页面 -->
+                        <div class="col-lg-8">
+                            <!-- 单词 -->
                             <div class="card shadow mb-4">
-                                <!-- Card Header - Dropdown -->
-                                <div
-                                    class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                                    <h6 class="m-0 font-weight-bold text-primary">遗忘曲线</h6>
-                                </div>
-                                <!-- Card Body -->
-                                <div class="card-body">
-                                    <div class="chart-area">
-                                        <canvas id="myAreaChart"></canvas>
+                                <!-- Card Header - Accordion -->
+                                <a href="#collapseCardExample" class="d-block card-header py-3" data-toggle="collapse" role="button" aria-expanded="true" aria-controls="collapseCardExample">
+                                    <h6 class="m-0 font-weight-bold text-primary">单词</h6>
+                                </a>
+                                <!-- Card Content - Collapse -->
+                                <div class="collapse show" id="collapseCardExample">
+                                    <div class="card-body">
+                                        <h2 class="h2 text-gray-900">hello</h2>
+                                        <h4 class="h4 text-gray-500">美 [heˈləʊ] 英 [hə'ləʊ</h4>
                                     </div>
+                                </div>
+                            </div>
+
+                            <!-- 释义 -->
+                            <div class="card shadow mb-4">
+                                <!-- Card Header - Accordion -->
+                                <a href="#collapseCardExample" class="d-block card-header py-3" data-toggle="collapse" role="button" aria-expanded="true" aria-controls="collapseCardExample">
+                                    <h6 class="m-0 font-weight-bold text-primary">释义</h6>
+                                </a>
+                                <!-- Card Content - Collapse -->
+                                <div class="collapse show" id="collapseCardExample">
+                                    <div class="card-body">
+                                        <div class="card mb-2 py-0 border-left-success">
+                                            <div class="card-body">
+                                                <span class="h5 text-gray-700">int. </span>
+                                                <span class="h5 text-gray-500">你好；喂；您好；哈喽</span>
+                                            </div>
+                                        </div>
+                                        <div class="card mb-2 py-0 border-left-success">
+                                            <div class="card-body">
+                                                <span class="h5 text-gray-700">int. </span>
+                                                <span class="h5 text-gray-500">你好；喂；您好；哈喽</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- 英文例句 -->
+                            <div class="card shadow mb-4">
+                                <!-- Card Header - Accordion -->
+                                <a href="#collapseCardExample" class="d-block card-header py-3" data-toggle="collapse" role="button" aria-expanded="true" aria-controls="collapseCardExample">
+                                    <h6 class="m-0 font-weight-bold text-primary">例句</h6>
+                                </a>
+                                <!-- Card Content - Collapse -->
+                                <div class="collapse show" id="collapseCardExample">
+                                    <div class="card-body">
+                                        <div class="card mb-2 py-0 border-left-success">
+                                            <div class="card-body">
+                                                <p class="h5 text-gray-700">Hello world!</p>
+                                                <p class="h5 text-gray-500">你好世界</p>
+                                            </div>
+                                        </div>
+                                        <div class="card mb-2 py-0 border-left-success">
+                                            <div class="card-body">
+                                                <p class="h5 text-gray-700">Hello world!</p>
+                                                <p class="h5 text-gray-500">你好世界</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 选择 -->
+                            <div class="card mb-4">
+                                <div class="card-body">
+                                    <input type="submit" class="btn btn-success btn-user btn-block" value="下一个">
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Area Chart 2 -->
-                        <div class="col-xl-6 col-lg-6">
+                        <!-- 显示复习的页面 -->
+                        <div class="col-lg-8">
+                            <!-- 释义 -->
                             <div class="card shadow mb-4">
-                                <!-- Card Header - Dropdown -->
-                                <div
-                                    class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                                    <h6 class="m-0 font-weight-bold text-primary">记忆单词数量</h6>
-                                </div>
-                                <!-- Card Body -->
-                                <div class="card-body">
-                                    <div class="chart-area">
-                                        <canvas id="myBarChart"></canvas>
+                                <!-- Card Header - Accordion -->
+                                <a href="#collapseCardExample" class="d-block card-header py-3" data-toggle="collapse" role="button" aria-expanded="true" aria-controls="collapseCardExample">
+                                    <h6 class="m-0 font-weight-bold text-primary">释义</h6>
+                                </a>
+                                <!-- Card Content - Collapse -->
+                                <div class="collapse show" id="collapseCardExample">
+                                    <div class="card-body">
+                                        <div class="card mb-2 py-0 border-left-success">
+                                            <div class="card-body">
+                                                <span class="h5 text-gray-700">int. </span>
+                                                <span class="h5 text-gray-500">你好；喂；您好；哈喽</span>
+                                            </div>
+                                        </div>
+                                        <div class="card mb-2 py-0 border-left-success">
+                                            <div class="card-body">
+                                                <span class="h5 text-gray-700">int. </span>
+                                                <span class="h5 text-gray-500">你好；喂；您好；哈喽</span>
+                                            </div>
+                                        </div>
                                     </div>
+                                </div>
+                            </div>
+
+                            <!-- 英文例句 -->
+                            <div class="card shadow mb-4">
+                                <!-- Card Header - Accordion -->
+                                <a href="#collapseCardExample" class="d-block card-header py-3" data-toggle="collapse" role="button" aria-expanded="true" aria-controls="collapseCardExample">
+                                    <h6 class="m-0 font-weight-bold text-primary">例句</h6>
+                                </a>
+                                <!-- Card Content - Collapse -->
+                                <div class="collapse show" id="collapseCardExample">
+                                    <div class="card-body">
+                                        <div class="card mb-2 py-0 border-left-success">
+                                            <div class="card-body">
+                                                <p class="h5 text-gray-700">____ world!</p>
+                                                <p class="h5 text-gray-500">你好世界</p>
+                                            </div>
+                                        </div>
+                                        <div class="card mb-2 py-0 border-left-success">
+                                            <div class="card-body">
+                                                <p class="h5 text-gray-700">_____ world!</p>
+                                                <p class="h5 text-gray-500">你好世界</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 选择 -->
+                            <div class="card mb-4">
+                                <div class="card-body">
+                                    <form>
+                                        <div class="row">
+                                            <div class="col-sm-8 mb-2 mb-sm-0">
+                                                <input type="text" class="form-control form-control-user" placeholder="请输入单词，熟悉可不用输入">
+                                            </div>
+                                            <div class="col-sm-2 mb-2 mb-sm-0">
+                                                <input type="submit" class="btn btn-success btn-user" value="熟悉">
+                                            </div>
+                                            <div class="col-sm-2 mb-2 mb-sm-0">
+                                                <input type="submit" class="btn btn-danger btn-user" value="提交">
+                                            </div>
+                                        </div>
+                                    </form>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Pie Chart -->
-                        <div class="col-xl-12 col-lg-12">
+                        <!-- 复习之后的页面 -->
+                        <div class="col-lg-8">
+                            <!-- 单词 -->
                             <div class="card shadow mb-4">
-                                <!-- Card Header - Dropdown -->
-                                <div
-                                    class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                                    <h6 class="m-0 font-weight-bold text-primary">学习情况</h6>
-                                </div>
-                                <!-- Card Body -->
-                                <div class="card-body">
-                                    <div class="chart-pie pt-4 pb-2">
-                                        <canvas id="myPieChart"></canvas>
-                                    </div>
-                                    <div class="mt-4 text-center small">
-                                        <span class="mr-2">
-                                            <i class="fas fa-circle text-success"></i> 平均每天新学单词量
-                                        </span>
-                                        <span class="mr-2">
-                                            <i class="fas fa-circle text-info"></i> 平均每天复习单词量
-                                        </span>
+                                <!-- Card Header - Accordion -->
+                                <a href="#collapseCardExample" class="d-block card-header py-3" data-toggle="collapse" role="button" aria-expanded="true" aria-controls="collapseCardExample">
+                                    <h6 class="m-0 font-weight-bold text-primary">单词</h6>
+                                </a>
+                                <!-- Card Content - Collapse -->
+                                <div class="collapse show" id="collapseCardExample">
+                                    <div class="card-body">
+                                        <h2 class="h2 text-gray-900">hello</h2>
+                                        <h4 class="h4 text-gray-500">美 [heˈləʊ] 英 [hə'ləʊ</h4>
                                     </div>
                                 </div>
                             </div>
+
+                            <!-- 释义 -->
+                            <div class="card shadow mb-4">
+                                <!-- Card Header - Accordion -->
+                                <a href="#collapseCardExample" class="d-block card-header py-3" data-toggle="collapse" role="button" aria-expanded="true" aria-controls="collapseCardExample">
+                                    <h6 class="m-0 font-weight-bold text-primary">释义</h6>
+                                </a>
+                                <!-- Card Content - Collapse -->
+                                <div class="collapse show" id="collapseCardExample">
+                                    <div class="card-body">
+                                        <div class="card mb-2 py-0 border-left-success">
+                                            <div class="card-body">
+                                                <span class="h5 text-gray-700">int. </span>
+                                                <span class="h5 text-gray-500">你好；喂；您好；哈喽</span>
+                                            </div>
+                                        </div>
+                                        <div class="card mb-2 py-0 border-left-success">
+                                            <div class="card-body">
+                                                <span class="h5 text-gray-700">int. </span>
+                                                <span class="h5 text-gray-500">你好；喂；您好；哈喽</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 英文例句 -->
+                            <div class="card shadow mb-4">
+                                <!-- Card Header - Accordion -->
+                                <a href="#collapseCardExample" class="d-block card-header py-3" data-toggle="collapse" role="button" aria-expanded="true" aria-controls="collapseCardExample">
+                                    <h6 class="m-0 font-weight-bold text-primary">例句</h6>
+                                </a>
+                                <!-- Card Content - Collapse -->
+                                <div class="collapse show" id="collapseCardExample">
+                                    <div class="card-body">
+                                        <div class="card mb-2 py-0 border-left-success">
+                                            <div class="card-body">
+                                                <p class="h5 text-gray-700">Hello world!</p>
+                                                <p class="h5 text-gray-500">你好世界</p>
+                                            </div>
+                                        </div>
+                                        <div class="card mb-2 py-0 border-left-success">
+                                            <div class="card-body">
+                                                <p class="h5 text-gray-700">Hello world!</p>
+                                                <p class="h5 text-gray-500">你好世界</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 选择 -->
+                            <div class="card mb-4">
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-4">
+                                            <input type="submit" class="btn btn-success btn-user btn-block" value="熟悉">
+                                        </div>
+                                        <div class="col-4">
+                                            <input type="submit" class="btn btn-warning btn-user btn-block" value="模糊">
+                                        </div>
+                                        <div class="col-4">
+                                            <input type="submit" class="btn btn-danger btn-user btn-block" value="陌生">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
                         </div>
                     </div>
                 </div>
-
             </div>
             <!-- End of Main Content -->
 

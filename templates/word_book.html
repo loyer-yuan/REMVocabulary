@@ -8,7 +8,7 @@
     <meta name="description" content="DB-design">
     <meta name="author" content="loyer">
 
-    <title>首页 · 学英语</title>
+    <title>选词 · 学英语</title>
 
     <!-- Custom fonts for this template-->
     <link href="../static/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
@@ -175,157 +175,139 @@
                 <div class="container-fluid">
                     <!-- Page Heading -->
                     <div class="d-sm-flex align-items-center justify-content-between mb-4">
-                        <h1 class="h3 mb-0 text-gray-800">数据展示</h1>
+                        <h1 class="h3 mb-0 text-gray-800">选词</h1>
                     </div>
 
-                    <!-- Content Row -->
-                    <div class="row">
-                        <!-- Earnings (Monthly) Card Example -->
-                        <div class="col-xl-3 col-md-6 mb-4">
-                            <div class="card border-left-primary shadow h-100 py-2">
-                                <div class="card-body">
-                                    <div class="row no-gutters align-items-center">
-                                        <div class="col mr-2">
-                                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
-                                                连续签到</div>
-                                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ data.consecutive_check }}</div>
-                                        </div>
-                                        <div class="col-auto">
-                                            <i class="fas fa-calendar fa-2x text-gray-300"></i>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Earnings (Monthly) Card Example -->
-                        <div class="col-xl-3 col-md-6 mb-4">
-                            <div class="card border-left-success shadow h-100 py-2">
-                                <div class="card-body">
-                                    <div class="row no-gutters align-items-center">
-                                        <div class="col mr-2">
-                                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
-                                                累计签到</div>
-                                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ data.add_check }}</div>
-                                        </div>
-                                        <div class="col-auto">
-                                            <i class="fas fa-calendar fa-2x text-gray-300"></i>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Earnings (Monthly) Card Example -->
-                        <div class="col-xl-3 col-md-6 mb-4">
-                            <div class="card border-left-warning shadow h-100 py-2">
-                                <div class="card-body">
-                                    <div class="row no-gutters align-items-center">
-                                        <div class="col mr-2">
-                                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
-                                                最大连续</div>
-                                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ data.max_check }}</div>
-                                        </div>
-                                        <div class="col-auto">
-                                            <i class="fas fa-calendar fa-2x text-gray-300"></i>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Earnings (Monthly) Card Example -->
-                        <div class="col-xl-3 col-md-6 mb-4">
-                            <div class="card border-left-info shadow h-100 py-2">
-                                <div class="card-body">
-                                    <div class="row no-gutters align-items-center">
-                                        <div class="col mr-2">
-                                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">背词进度
-                                            </div>
-                                            <div class="row no-gutters align-items-center">
-                                                <div class="col-auto">
-                                                    <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800">{{ data.progress }}%</div>
-                                                </div>
-                                                <div class="col">
-                                                    <div class="progress progress-sm mr-2">
-                                                        <div class="progress-bar bg-info" role="progressbar"
-                                                            style="width: {{ data.progress }}%" aria-valuenow="50" aria-valuemin="0"
-                                                            aria-valuemax="100"></div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-auto">
-                                            <i class="fas fa-clipboard-list fa-2x text-gray-300"></i>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                    <div class="d-sm-flex align-items-center justify-content-between mb-2">
+                        <h3 class="h3 mb-0 text-secondary">当前单词本</h3>
                     </div>
-                    <!-- Content Row -->
 
                     <div class="row">
-
-                        <!-- Area Chart 1 -->
-                        <div class="col-xl-6 col-lg-6">
-                            <div class="card shadow mb-4">
-                                <!-- Card Header - Dropdown -->
-                                <div
-                                    class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                                    <h6 class="m-0 font-weight-bold text-primary">遗忘曲线</h6>
-                                </div>
-                                <!-- Card Body -->
+                        <div class="col-lg-6">
+                            <div class="card mb-4 py-3 border-bottom-danger">
                                 <div class="card-body">
-                                    <div class="chart-area">
-                                        <canvas id="myAreaChart"></canvas>
-                                    </div>
+                                    当前单词本
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Area Chart 2 -->
-                        <div class="col-xl-6 col-lg-6">
-                            <div class="card shadow mb-4">
-                                <!-- Card Header - Dropdown -->
-                                <div
-                                    class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                                    <h6 class="m-0 font-weight-bold text-primary">记忆单词数量</h6>
-                                </div>
-                                <!-- Card Body -->
-                                <div class="card-body">
-                                    <div class="chart-area">
-                                        <canvas id="myBarChart"></canvas>
+                        <!-- 上传 -->
+                        <input type="button" class="btn btn-info mb-4 py-2" value= "上传单词本" />
+                    </div>
+
+                    <!-- 分界线 -->
+                    <hr class="sidebar-divider d-none d-md-block">
+
+                    <div class="d-sm-flex align-items-center justify-content-between mb-2">
+                        <h3 class="h3 mb-0 text-secondary">其他单词本</h3>
+                    </div>
+
+                    <div class="row">
+                        <!-- 一列 -->
+                        <div class="col-lg-6">
+
+                            <!-- 选择的单词本 -->
+                            <div class="row">
+                                <div class="col-lg-10">
+                                    <div class="card mb-4 py-3 border-left-primary">
+                                        <div class="card-body">
+                                            .border-left-primary
+                                        </div>
                                     </div>
                                 </div>
+                                <input type="button" class="btn btn-info mb-4 py-2" value= "选择" />
+                            </div>
+
+                            <!-- 选择的单词本 -->
+                            <div class="row">
+                                <div class="col-lg-10">
+                                    <div class="card mb-4 py-3 border-left-primary">
+                                        <div class="card-body">
+                                            .border-left-primary
+                                        </div>
+                                    </div>
+                                </div>
+                                <input type="button" class="btn btn-info mb-4 py-2" value= "选择" />
+                            </div>
+
+                            <!-- 选择的单词本 -->
+                            <div class="row">
+                                <div class="col-lg-10">
+                                    <div class="card mb-4 py-3 border-left-primary">
+                                        <div class="card-body">
+                                            .border-left-primary
+                                        </div>
+                                    </div>
+                                </div>
+                                <input type="button" class="btn btn-info mb-4 py-2" value= "选择" />
+                            </div>
+
+                            <!-- 选择的单词本 -->
+                            <div class="row">
+                                <div class="col-lg-10">
+                                    <div class="card mb-4 py-3 border-left-primary">
+                                        <div class="card-body">
+                                            .border-left-primary
+                                        </div>
+                                    </div>
+                                </div>
+                                <input type="button" class="btn btn-info mb-4 py-2" value= "选择" />
                             </div>
                         </div>
 
-                        <!-- Pie Chart -->
-                        <div class="col-xl-12 col-lg-12">
-                            <div class="card shadow mb-4">
-                                <!-- Card Header - Dropdown -->
-                                <div
-                                    class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                                    <h6 class="m-0 font-weight-bold text-primary">学习情况</h6>
-                                </div>
-                                <!-- Card Body -->
-                                <div class="card-body">
-                                    <div class="chart-pie pt-4 pb-2">
-                                        <canvas id="myPieChart"></canvas>
-                                    </div>
-                                    <div class="mt-4 text-center small">
-                                        <span class="mr-2">
-                                            <i class="fas fa-circle text-success"></i> 平均每天新学单词量
-                                        </span>
-                                        <span class="mr-2">
-                                            <i class="fas fa-circle text-info"></i> 平均每天复习单词量
-                                        </span>
+                        <!-- 一列 -->
+                        <div class="col-lg-6">
+
+                            <!-- 选择的单词本 -->
+                            <div class="row">
+                                <div class="col-lg-10">
+                                    <div class="card mb-4 py-3 border-left-primary">
+                                        <div class="card-body">
+                                            .border-left-primary
+                                        </div>
                                     </div>
                                 </div>
+                                <input type="button" class="btn btn-info mb-4 py-2" value= "选择" />
+                            </div>
+
+                            <!-- 选择的单词本 -->
+                            <div class="row">
+                                <div class="col-lg-10">
+                                    <div class="card mb-4 py-3 border-left-primary">
+                                        <div class="card-body">
+                                            .border-left-primary
+                                        </div>
+                                    </div>
+                                </div>
+                                <input type="button" class="btn btn-info mb-4 py-2" value= "选择" />
+                            </div>
+
+                            <!-- 选择的单词本 -->
+                            <div class="row">
+                                <div class="col-lg-10">
+                                    <div class="card mb-4 py-3 border-left-primary">
+                                        <div class="card-body">
+                                            .border-left-primary
+                                        </div>
+                                    </div>
+                                </div>
+                                <input type="button" class="btn btn-info mb-4 py-2" value= "选择" />
+                            </div>
+
+                            <!-- 选择的单词本 -->
+                            <div class="row">
+                                <div class="col-lg-10">
+                                    <div class="card mb-4 py-3 border-left-primary">
+                                        <div class="card-body">
+                                            .border-left-primary
+                                        </div>
+                                    </div>
+                                </div>
+                                <input type="button" class="btn btn-info mb-4 py-2" value= "选择" />
                             </div>
                         </div>
                     </div>
+
                 </div>
 
             </div>
