@@ -332,4 +332,71 @@ def getDataOfIndex(user):
         print("取出平均复习单词的数量: " + avg_preview)
     data['avg_preview'] = avg_preview
 
+    mysql.end("commit")
+    mysql.dispose()
     return data
+
+
+def getSetPageData(user):
+    """
+    return study_number
+    """
+    mysql = MyPymysql()
+    username = user['username']
+    plan_numbers = mysql.getOne("select plan_number from remember_word where username = %s;", [username])
+    if debug:
+        print("获得setting页面的数据plan_number： " + str(plan_numbers[0]))
+    mysql.dispose()
+    return str(plan_numbers[0])
+
+
+def setPlanNum(user, change_data):
+    """
+    update plan_number of the user
+    """
+    username = user['username']
+    mysql = MyPymysql()
+    if debug:
+        print("修改remember_word表的username为：" + str(username)
+              + "中的plan_number为：" + str(change_data))
+    mysql.update("update remember_word "
+                 "set plan_number = %s "
+                 "where username = %s;", [change_data, username])
+    mysql.end("commit")
+    mysql.dispose()
+
+
+def setAlias(user, change_data):
+    """
+    update alias of the user
+    """
+    username = user['username']
+    mysql = MyPymysql()
+    if debug:
+        print("修改remember_word表的username为：" + str(username)
+              + "中的alias为：" + str(change_data))
+    mysql.update("update user "
+                 "set alias = %s "
+                 "where username = %s;", [change_data, username])
+    mysql.end("commit")
+    mysql.dispose()
+
+
+def setPassword(user, password):
+    """
+    update password
+    """
+    username = user['username']
+    m = hashlib.md5()
+    m.update(password.encode())
+    password_m = m.hexdigest()
+    mysql = MyPymysql()
+    if debug:
+        print("现在更新用户为：" + username
+              + "的密码\t新密码为：" + password
+              + "\t加密后，存入数据库新密码为" + password_m)
+    mysql.update("update user "
+                 "set password = %s "
+                 "where username = %s", [password_m, username])
+    mysql.end("commit")
+    mysql.dispose()

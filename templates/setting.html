@@ -30,7 +30,7 @@
         <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
 
             <!-- Sidebar - Brand -->
-            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="index.html">
+            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="{% url 'index' %}">
                 <div class="sidebar-brand-icon rotate-n-15">
                     <i class="fas fa-laugh-wink"></i>
                 </div>
@@ -42,7 +42,7 @@
 
             <!-- Nav Item - Dashboard -->
             <li class="nav-item">
-                <a class="nav-link" href="index.html">
+                <a class="nav-link" href="{% url 'index' %}">
                     <i class="fas fa-fw fa-tachometer-alt"></i>
                     <span>统计</span></a>
             </li>
@@ -52,7 +52,7 @@
 
             <!-- 学习 -->
             <li class="nav-item">
-                <a class="nav-link" href="index.html">
+                <a class="nav-link" href="#">
                     <i class="fas fa-fw fa-user"></i>
                     <span>学习</span></a>
             </li>
@@ -62,7 +62,7 @@
 
             <!-- 单词本 -->
             <li class="nav-item">
-                <a class="nav-link" href="index.html">
+                <a class="nav-link" href="#">
                     <i class="fas fa-fw fa-folder-open"></i>
                     <span>选词</span></a>
             </li>
@@ -72,7 +72,7 @@
 
             <!-- 个人信息修改 -->
             <li class="nav-item active">
-                <a class="nav-link" href="index.html">
+                <a class="nav-link" href="{% url 'setting' %}">
                     <i class="fas fa-fw fa-cogs"></i>
                     <span>设置</span></a>
             </li>
@@ -191,9 +191,12 @@
                             <div class="card shadow mb-4">
                                 <div class="card-body">
                                     <h5 class="text-black-50">别名：</h5>
-                                    <form class="user">
+                                    <form class="user" action="/setting/" method="post">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="type" value="alias">
                                         <div class="form-group">
-                                            <input type="text" class="form-control form-control-user" value="{{ user.alias }}" required>
+                                            <input type="text" class="form-control form-control-user"
+                                                   value="{{ user.alias }}" name="alias" required>
                                         </div>
                                         <input type="submit" class="btn btn-primary btn-user btn-block">
                                     </form>
@@ -202,19 +205,25 @@
                             <div class="card shadow mb-4">
                                 <div class="card-body">
                                     <h5 class="text-black-50">密码修改：</h5>
-                                    <form class="user">
+                                    <form class="user" action="/setting/" method="post">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="type" value="changePassword">
                                         <div class="form-group">
                                             <input type="password" class="form-control form-control-user"
-                                                   autocomplete="off" placeholder="输入旧密码" required>
+                                                   autocomplete="off" placeholder="输入旧密码"
+                                                   name="oldPassword" required>
                                         </div>
                                         <div class="form-group">
                                             <input type="password" class="form-control form-control-user"
-                                                   autocomplete="off" placeholder="输入新密码" required>
+                                                   autocomplete="off" placeholder="输入新密码"
+                                                   name="newPassword" required>
                                         </div>
                                         <div class="form-group">
                                             <input type="password" class="form-control form-control-user"
-                                                   autocomplete="off" placeholder="重复新密码" required>
+                                                   autocomplete="off" placeholder="重复新密码"
+                                                   name="repeatNewPassword" required>
                                         </div>
+                                        <h4 class="h4 text-danger">{{ error }}</h4>
                                         <input type="submit" class="btn btn-primary btn-user btn-block">
                                     </form>
                                 </div>
@@ -232,9 +241,12 @@
                                 <div class="card-body">
                                     <h5 class="text-black-50">每日学单词数量：</h5>
                                     <p class="text-gray-500 mb-0">包括每日新学单词和每日复习单词</p>
-                                    <form class="user">
+                                    <form class="user" action="/setting/" method="post">
+                                        {% csrf_token %}
+                                        <input type="hidden" value="plan_number" name="type">
                                         <div class="form-group">
-                                            <input type="number" class="form-control form-control-user" value="这里需要补充" required>
+                                            <input type="number" class="form-control form-control-user"
+                                                   value="{{ plan_number }}" name="plan_number" required>
                                         </div>
                                         <input type="submit" class="btn btn-success btn-user btn-block">
                                     </form>
@@ -243,8 +255,7 @@
                         </div>
 
                     </div>
-                    <!-- Content Row -->
-
+                </div>
             </div>
             <!-- End of Main Content -->
 

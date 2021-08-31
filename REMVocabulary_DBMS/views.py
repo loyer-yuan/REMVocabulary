@@ -134,9 +134,79 @@ def indexPage(request):
                 'avg_preview: '
                }
     """
+    # 首先检查session，判断用户是否第一次登录，如果不是，则直接重定向到首页
     if 'user' not in request.session:
         return HttpResponseRedirect('/login/')
     user = request.session['user']
+    # 取出展示数据需要的所有数据
     data = getDataOfIndex(user)
     context = {'user': user, 'data': data}
     return render(request, 'index.html', context)
+
+
+def setPage(request):
+    # 首先检查session，判断用户是否第一次登录，如果不是，则直接重定向到首页
+    if 'user' not in request.session:
+        return HttpResponseRedirect('/login/')
+    # 取出user数据
+    user = request.session['user']
+    if request.method == "GET":
+        """
+        向setPage页面传递的数据为：
+        'user' = {'username': ,'alias': }
+        'plan_number' =  
+        """
+        plan_numbers = getSetPageData(user)
+        context = {'user': user,
+                   'plan_number': plan_numbers}
+        return render(request, 'setting.html', context)
+    if request.method == "POST":
+        # 获取表单的type，从而明确提交过来的是哪个表单
+        types = request.POST.get("type")
+        types = str(types)
+
+        # 处理修改每日学习数量的表单
+        if types == "plan_number":
+            change_data = request.POST.get("plan_number")
+            # 修改计划学习数量
+            setPlanNum(user, int(change_data))
+
+        # 处理修改别名的表单
+        if types == "alias":
+            change_data = request.POST.get("alias")
+            # 修改别名
+            setAlias(user, change_data)
+            user['alias'] = change_data
+            if debug:
+                print("修改了用户：" + user['username']
+                      + "的别名为： " + user['alias'])
+            request.session['user'] = user
+
+        # 处理修改密码的表单
+        if types == "changePassword":
+            old_password = request.POST.get("oldPassword")
+            new_password = request.POST.get("newPassword")
+            repeat_new_password = request.POST.get("repeatNewPassword")
+            # 两次密码输入不一致
+            if new_password != repeat_new_password:
+                plan_numbers = getSetPageData(user)
+                context = {'user': user,
+                           'plan_number': plan_numbers,
+                           'error': "两次密码输入不一致"}
+                return render(request, 'setting.html', context)
+            # 验证旧密码是否正确
+            state = verify(user['username'], old_password)
+            # 旧密码输入不正确
+            if state != 0:
+                plan_numbers = getSetPageData(user)
+                context = {'user': user,
+                           'plan_number': plan_numbers,
+                           'error': "旧密码输入错误"}
+                return render(request, 'setting.html', context)
+            # 密码输入正确，且两次都正确，修改密码
+            setPassword(user, new_password)
+            # 更新密码需要重新登录
+            return HttpResponseRedirect('/logout/')
+
+        # 执行完修改plan_number和alias，重新载入页面
+        return HttpResponseRedirect('/setting/')
