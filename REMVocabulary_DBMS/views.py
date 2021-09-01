@@ -1,5 +1,9 @@
-from django.http import HttpResponseRedirect
+import os.path
+
+from django.http import HttpResponseRedirect, StreamingHttpResponse
 from django.shortcuts import render, redirect
+from django.utils.encoding import escape_uri_path
+
 from REMVocabulary_DBMS.model import *
 
 """
@@ -210,3 +214,158 @@ def setPage(request):
 
         # 执行完修改plan_number和alias，重新载入页面
         return HttpResponseRedirect('/setting/')
+
+
+def upload_word_book(request):
+    """
+    处理上传单词本
+    """
+    username = request.POST.get("username")
+    # 获取上传的文件，如果没有文件，则默认为None
+    word_book = request.FILES.get("word_book", None)
+    # 没有上传文件，没有上传txt文件
+    book_name = str(word_book.name)
+
+    # 错误需要重新渲染html
+    user = request.session['user']
+    # 获取数据
+    book_list = get_book_list(user)
+    the_current_book = get_current_book(user)
+    current_book = []
+    # 如果有数据
+    if the_current_book:
+        current_book = the_current_book[0]
+    left_book_list = []
+    right_book_list = []
+    # book_list存在数据
+    if book_list:
+        flag = True
+        for book in book_list:
+            # 交替分配数据给两个列表
+            if flag:
+                left_book_list.append(book[0])
+                flag = False
+            else:
+                right_book_list.append(book[0])
+                flag = True
+    context = {'user': user,
+               'left_book_list': left_book_list,
+               'right_book_list': right_book_list,
+               'current_book': current_book}
+    # 没有上传文件
+    if not word_book:
+        error = '没有上传文件'
+        context['error'] = error
+        return render(request, 'word_book.html', context)
+    # 上传文件不是txt
+    if not book_name.endswith(".txt"):
+        error = '上传单词本不是txt格式'
+        context['error'] = error
+        return render(request, 'word_book.html', context)
+    # 命名带有下划线
+    if len(book_name.split('_')) > 1:
+        error = '命名不能带有下划线'
+        context['error'] = error
+        return render(request, 'word_book.html', context)
+    # 上传了同名文件
+    if is_exist_book(username, book_name):
+        error = '已经上传了相同名字的单词本'
+        context['error'] = error
+        return render(request, 'word_book.html', context)
+
+    # 先存储，再处理，再放入mysql
+    # 命名：用户名_单词本
+    filename = username + "_" + book_name
+    # getcwd()获取当前路径，然后找到word_book文件夹
+    destination = open(os.path.join(os.getcwd()+r"\word_book", filename), 'wb+')
+    # 分块写入文件
+    for chunk in word_book.chunks():
+        destination.write(chunk)
+    destination.close()
+    if debug:
+        print("文件 " + filename + " 写入word_book文件夹完成！")
+
+    # 将单词本导入到数据库中
+    isSuccess = word_book_to_sql(filename)
+    if not isSuccess:
+        # 插入的单词本有不在单词库的单词
+        error = '插入的单词本有不在单词库的单词，请检查'
+        context['error'] = error
+        return render(request, 'word_book.html', context)
+    return HttpResponseRedirect('/word_book/')
+
+
+def download_word_book(request):
+    """
+    下载对应的单词本
+    """
+    def down_chunk_file_manager(file_path, chuck_size=1024):
+        with open(file_path, "rb") as file:
+            while True:
+                chuck_stream = file.read(chuck_size)
+                if chuck_stream:
+                    yield chuck_stream
+                else:
+                    break
+    if 'user' not in request.session:
+        return HttpResponseRedirect('/login/')
+    book_name = request.GET.get("word_book")
+    username = request.session['user']['username']
+    file_name = username + "_" + book_name + ".txt"
+    filepath = os.path.join(os.getcwd()+r"\word_book", file_name)
+
+    response = StreamingHttpResponse(down_chunk_file_manager(filepath))
+    response['Content-Type'] = 'application/octet-stream'
+    response['Content-Disposition'] = 'attachment;filename="{0}"'.format(escape_uri_path(book_name+".txt"))
+
+    return response
+
+
+def select_book(request):
+    """
+    选择要背诵的单词本
+    """
+    username = request.session['user']['username']
+    word_book = request.POST.get('word_book')
+    choice_book(username, word_book)
+
+    return HttpResponseRedirect('/word_book/')
+
+
+def word_book_page(request):
+    """
+    填充选择单词本页面的相应的数据:
+    'user': {'username','alias'}
+    'left_book_list': []
+    'right_book_list': []
+    'current_book':
+    """
+    # 没有登录就访问，直接要登录
+    if 'user' not in request.session:
+        return HttpResponseRedirect('/login/')
+    user = request.session['user']
+    # 获取数据
+    book_list = get_book_list(user)
+    the_current_book = get_current_book(user)
+    current_book = []
+    # 如果有数据
+    if the_current_book:
+        current_book = the_current_book[0]
+    left_book_list = []
+    right_book_list = []
+    # book_list存在数据
+    if book_list:
+        flag = True
+        for book in book_list:
+            # 交替分配数据给两个列表
+            if flag:
+                left_book_list.append(book[0])
+                flag = False
+            else:
+                right_book_list.append(book[0])
+                flag = True
+    context = {'user': user,
+               'left_book_list': left_book_list,
+               'right_book_list': right_book_list,
+               'current_book': current_book}
+    return render(request, "word_book.html", context)

@@ -1,4 +1,5 @@
 import hashlib
+import os
 
 import pymysql
 
@@ -252,9 +253,9 @@ def getDataOfIndex(user):
     else:
         # 用book_name在word_book表中取出该单词本的数据
         total_num = mysql.getOne("select count(words) from word_book "
-                                 "where 'word-book' = %s and username = %s;", [book_name, username])
+                                 "where word_book = %s and username = %s;", [book_name, username])
         study_word_num = mysql.getOne("select count(words) from word_book "
-                                      "where 'word-book' = %s and username = %s and degree <> 'not learning';"
+                                      "where word_book = %s and username = %s and degree <> 'not learning';"
                                       , [book_name, username])
         # 计算进度，并且换算成百分制
         progress = '0'
@@ -397,6 +398,115 @@ def setPassword(user, password):
               + "\t加密后，存入数据库新密码为" + password_m)
     mysql.update("update user "
                  "set password = %s "
-                 "where username = %s", [password_m, username])
+                 "where username = %s;", [password_m, username])
     mysql.end("commit")
     mysql.dispose()
+
+
+def word_book_to_sql(file_name):
+    """
+    将单词本从txt文件导入到数据库中
+    :param file_name: username_bookname.txt
+    :returns
+    False - 插入的单词本有不在单词库的单词
+    True - 成功插入
+    """
+    # 获取文件位置
+    # 获取当前路径
+    # path = os.getcwd()
+    # 获取父目录
+    # root_path = os.path.abspath(os.path.join(path, os.pardir))
+    # target = os.path.join(root_path, file_name)
+    target = os.path.join(os.getcwd()+r"\word_book", file_name)
+    # 去掉后缀名
+    book = file_name.split(".")[0]
+    # 获取用户名
+    username = book.split("_")[0]
+    # 去掉用户名
+    book = book.split("_")[1]
+    mysql = MyPymysql()
+
+    # sql准备
+    sql = "insert into word_book (words, word_book, username) " \
+          "values (%s, %s, %s);"
+
+    # 开始事务
+    try:
+        mysql.begin()
+        # 获取文件每一行的单词
+        with open(target, 'r') as f:
+            # 不能使用readlines(), 会读取到\n
+            data_set = f.read().splitlines()
+            for data in data_set:
+                # 全部小写
+                data = str.lower(data)
+                mysql.insert(sql, [data, book, username])
+        # 结束事务
+        mysql.end("commit")
+    except:
+        return False
+    if debug:
+        print("单词本 " + book + " 插入数据库完成！")
+    mysql.dispose()
+    return True
+
+
+def is_exist_book(username, book_name):
+    """
+    查找是否该用户已经存在该单词本
+    """
+    # 去掉后缀名
+    book = book_name.split(".")[0]
+    mysql = MyPymysql()
+    state = mysql.getOne("select 1 from word_book "
+                         "where username = %s and word_book = %s;",
+                         [username, book])
+    if state:
+        # 存在该单词本
+        return True
+    else:
+        return False
+
+
+def choice_book(username, book_name):
+    """
+    修改在背的单词书
+    """
+    mysql = MyPymysql()
+
+    mysql.begin()
+    mysql.update("update remember_word "
+                 "set word_book = %s "
+                 "where username = %s;", [book_name, username])
+    mysql.end("commit")
+    mysql.dispose()
+    if debug:
+        print("修改用户 " + username + " 背诵的单词书为 " + book_name)
+
+
+def get_book_list(user):
+    """
+    获取用户的所有单词本列表，可能为空
+    """
+    mysql = MyPymysql()
+    username = user['username']
+
+    book_list = mysql.getAll("select distinct word_book "
+                             "from word_book "
+                             "where username = %s;", [username])
+    if debug:
+        print("获取到用户 " + username + " 的单词本列表\n" + str(book_list))
+    return book_list
+
+
+def get_current_book(user):
+    """
+    获取当前用户的当前学习的单词书，有可能返回空集合
+    """
+    username = user['username']
+    mysql = MyPymysql()
+
+    book = mysql.getOne("select word_book "
+                        "from remember_word "
+                        "where username = %s;", [username])
+    return book

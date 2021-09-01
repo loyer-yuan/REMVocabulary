@@ -30,7 +30,7 @@
         <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
 
             <!-- Sidebar - Brand -->
-            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="index.html">
+            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="{% url 'index' %}">
                 <div class="sidebar-brand-icon rotate-n-15">
                     <i class="fas fa-laugh-wink"></i>
                 </div>
@@ -42,7 +42,7 @@
 
             <!-- Nav Item - Dashboard -->
             <li class="nav-item">
-                <a class="nav-link" href="index.html">
+                <a class="nav-link" href="{% url 'index' %}">
                     <i class="fas fa-fw fa-tachometer-alt"></i>
                     <span>统计</span></a>
             </li>
@@ -52,7 +52,7 @@
 
             <!-- 学习 -->
             <li class="nav-item">
-                <a class="nav-link" href="index.html">
+                <a class="nav-link" href="#">
                     <i class="fas fa-fw fa-user"></i>
                     <span>学习</span></a>
             </li>
@@ -62,7 +62,7 @@
 
             <!-- 单词本 -->
             <li class="nav-item active">
-                <a class="nav-link" href="index.html">
+                <a class="nav-link" href="{% url 'word_book' %}">
                     <i class="fas fa-fw fa-folder-open"></i>
                     <span>选词</span></a>
             </li>
@@ -72,7 +72,7 @@
 
             <!-- 个人信息修改 -->
             <li class="nav-item">
-                <a class="nav-link" href="index.html">
+                <a class="nav-link" href="{% url 'setting' %}">
                     <i class="fas fa-fw fa-cogs"></i>
                     <span>设置</span></a>
             </li>
@@ -154,7 +154,7 @@
                             <!-- Dropdown - User Information -->
                             <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
                                 aria-labelledby="userDropdown">
-                                <a class="dropdown-item" href="#">
+                                <a class="dropdown-item" href="{% url 'setting' %}">
                                     <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
                                     个人信息
                                 </a>
@@ -184,15 +184,33 @@
 
                     <div class="row">
                         <div class="col-lg-6">
+                            {% if current_book %}
                             <div class="card mb-4 py-3 border-bottom-danger">
                                 <div class="card-body">
-                                    当前单词本
+                                    {{ current_book }}
                                 </div>
                             </div>
+                            {% else %}
+                            <div class="card mb-4 py-3 border-bottom-danger">
+                                <div class="card-body">
+                                    快去选个单词本吧~
+                                </div>
+                            </div>
+                            {% endif %}
                         </div>
 
                         <!-- 上传 -->
-                        <input type="button" class="btn btn-info mb-4 py-2" value= "上传单词本" />
+                        <div class="col-lg-3"></div>
+                        <div class="col-lg-3">
+                            <form enctype="multipart/form-data" action="/upload_word_book/" method="POST">
+                                {% csrf_token %}
+                                <input type="hidden" name="username" value="{{ user.username }}" />
+                                <input type="file" class="btn" name="word_book" required />
+                                <input type="submit" class="btn btn-info mb-4 py-2" value= "上传单词本" />
+                            </form>
+                            <strong>{{ error }}</strong>
+                        </div>
+
                     </div>
 
                     <!-- 分界线 -->
@@ -205,106 +223,65 @@
                     <div class="row">
                         <!-- 一列 -->
                         <div class="col-lg-6">
-
+                            {% for book in left_book_list %}
                             <!-- 选择的单词本 -->
                             <div class="row">
                                 <div class="col-lg-10">
-                                    <div class="card mb-4 py-3 border-left-primary">
+                                    <div class="card mb-4 py-3 border-left-success">
                                         <div class="card-body">
-                                            .border-left-primary
+                                            {{ book }}
                                         </div>
                                     </div>
                                 </div>
-                                <input type="button" class="btn btn-info mb-4 py-2" value= "选择" />
+                                <div class="col-lg-2">
+                                    <form action="/select_book/" method="post">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="word_book" value="{{ book }}">
+                                        <input type="submit" class="btn btn-success mb-4 py-2" value= "选择" />
+                                    </form>
+                                    <div class="col-lg-auto"></div>
+                                    <form action="/download_word_book/" method="get">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="word_book" value="{{ book }}">
+                                        <input type="submit" class="btn btn-secondary mb-4 py-2" value= "下载" />
+                                    </form>
+                                </div>
                             </div>
+                            {% empty %}
+                                <h4 class="h4 mb-0 text-gray-500">这里空空如也~</h4>
+                            {% endfor %}
 
-                            <!-- 选择的单词本 -->
-                            <div class="row">
-                                <div class="col-lg-10">
-                                    <div class="card mb-4 py-3 border-left-primary">
-                                        <div class="card-body">
-                                            .border-left-primary
-                                        </div>
-                                    </div>
-                                </div>
-                                <input type="button" class="btn btn-info mb-4 py-2" value= "选择" />
-                            </div>
 
-                            <!-- 选择的单词本 -->
-                            <div class="row">
-                                <div class="col-lg-10">
-                                    <div class="card mb-4 py-3 border-left-primary">
-                                        <div class="card-body">
-                                            .border-left-primary
-                                        </div>
-                                    </div>
-                                </div>
-                                <input type="button" class="btn btn-info mb-4 py-2" value= "选择" />
-                            </div>
-
-                            <!-- 选择的单词本 -->
-                            <div class="row">
-                                <div class="col-lg-10">
-                                    <div class="card mb-4 py-3 border-left-primary">
-                                        <div class="card-body">
-                                            .border-left-primary
-                                        </div>
-                                    </div>
-                                </div>
-                                <input type="button" class="btn btn-info mb-4 py-2" value= "选择" />
-                            </div>
                         </div>
 
                         <!-- 一列 -->
                         <div class="col-lg-6">
-
+                            {% for book in right_book_list %}
                             <!-- 选择的单词本 -->
                             <div class="row">
                                 <div class="col-lg-10">
-                                    <div class="card mb-4 py-3 border-left-primary">
+                                    <div class="card mb-4 py-3 border-left-warning">
                                         <div class="card-body">
-                                            .border-left-primary
+                                            {{ book }}
                                         </div>
                                     </div>
                                 </div>
-                                <input type="button" class="btn btn-info mb-4 py-2" value= "选择" />
+                                <div class="col-lg-2">
+                                    <form action="/select_book/" method="post">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="word_book" value="{{ book }}">
+                                        <input type="submit" class="btn btn-warning mb-4 py-2" value= "选择" />
+                                    </form>
+                                    <div class="col-lg-auto"></div>
+                                    <form action="/download_word_book/" method="get">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="word_book" value="{{ book }}">
+                                        <input type="submit" class="btn btn-secondary mb-4 py-2" value= "下载" />
+                                    </form>
+                                </div>
                             </div>
+                            {% endfor %}
 
-                            <!-- 选择的单词本 -->
-                            <div class="row">
-                                <div class="col-lg-10">
-                                    <div class="card mb-4 py-3 border-left-primary">
-                                        <div class="card-body">
-                                            .border-left-primary
-                                        </div>
-                                    </div>
-                                </div>
-                                <input type="button" class="btn btn-info mb-4 py-2" value= "选择" />
-                            </div>
-
-                            <!-- 选择的单词本 -->
-                            <div class="row">
-                                <div class="col-lg-10">
-                                    <div class="card mb-4 py-3 border-left-primary">
-                                        <div class="card-body">
-                                            .border-left-primary
-                                        </div>
-                                    </div>
-                                </div>
-                                <input type="button" class="btn btn-info mb-4 py-2" value= "选择" />
-                            </div>
-
-                            <!-- 选择的单词本 -->
-                            <div class="row">
-                                <div class="col-lg-10">
-                                    <div class="card mb-4 py-3 border-left-primary">
-                                        <div class="card-body">
-                                            .border-left-primary
-                                        </div>
-                                    </div>
-                                </div>
-                                <input type="button" class="btn btn-info mb-4 py-2" value= "选择" />
-                            </div>
                         </div>
                     </div>
 
