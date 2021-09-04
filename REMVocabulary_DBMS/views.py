@@ -369,3 +369,10 @@ def word_book_page(request):
                'right_book_list': right_book_list,
                'current_book': current_book}
     return render(request, "word_book.html", context)
+
+
+def studyPage(request):
+    """
+    传递studyPage数据，并处理表单的结果
+    """
+

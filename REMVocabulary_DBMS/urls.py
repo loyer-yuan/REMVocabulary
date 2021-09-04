@@ -23,10 +23,15 @@ urlpatterns = [
     path('logout/', views.logout, name='logout'),
     path('base/', views.test, name='base'),
     path('register/', views.register, name='register'),
+    # index
     path('index/', views.indexPage, name='index'),
+    # setting
     path('setting/', views.setPage, name='setting'),
+    # word_book
     path('word_book/', views.word_book_page, name='word_book'),
     path('upload_word_book/', views.upload_word_book, name='upload_word_book'),
     path('download_word_book/', views.download_word_book, name='download_word_book'),
-    path('select_book/', views.select_book, name='select_book')
+    path('select_book/', views.select_book, name='select_book'),
+    # study
+    path('study/', views.studyPage, name='study')
 ]

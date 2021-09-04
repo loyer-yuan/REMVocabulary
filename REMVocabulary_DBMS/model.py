@@ -412,11 +412,6 @@ def word_book_to_sql(file_name):
     True - 成功插入
     """
     # 获取文件位置
-    # 获取当前路径
-    # path = os.getcwd()
-    # 获取父目录
-    # root_path = os.path.abspath(os.path.join(path, os.pardir))
-    # target = os.path.join(root_path, file_name)
     target = os.path.join(os.getcwd()+r"\word_book", file_name)
     # 去掉后缀名
     book = file_name.split(".")[0]
@@ -444,6 +439,7 @@ def word_book_to_sql(file_name):
         # 结束事务
         mysql.end("commit")
     except:
+        mysql.dispose()
         return False
     if debug:
         print("单词本 " + book + " 插入数据库完成！")
@@ -461,6 +457,7 @@ def is_exist_book(username, book_name):
     state = mysql.getOne("select 1 from word_book "
                          "where username = %s and word_book = %s;",
                          [username, book])
+    mysql.dispose()
     if state:
         # 存在该单词本
         return True
@@ -496,6 +493,7 @@ def get_book_list(user):
                              "where username = %s;", [username])
     if debug:
         print("获取到用户 " + username + " 的单词本列表\n" + str(book_list))
+    mysql.dispose()
     return book_list
 
 
@@ -509,4 +507,5 @@ def get_current_book(user):
     book = mysql.getOne("select word_book "
                         "from remember_word "
                         "where username = %s;", [username])
+    mysql.dispose()
     return book
