@@ -52,7 +52,7 @@
 
             <!-- 学习 -->
             <li class="nav-item">
-                <a class="nav-link" href="#">
+                <a class="nav-link" href="{% url 'study' %}">
                     <i class="fas fa-fw fa-user"></i>
                     <span>学习</span></a>
             </li>
@@ -249,7 +249,7 @@
                                                 <div class="col">
                                                     <div class="progress progress-sm mr-2">
                                                         <div class="progress-bar bg-info" role="progressbar"
-                                                            style="width: {{ data.progress }}%" aria-valuenow="50" aria-valuemin="0"
+                                                            style="width: {{ data.progress }}%" aria-valuenow="{{ data.progress }}" aria-valuemin="0"
                                                             aria-valuemax="100"></div>
                                                     </div>
                                                 </div>
@@ -392,7 +392,7 @@
         var myLineChart = new Chart(ctx, {
           type: 'line',
           data: {
-            labels: {{ data.or_key }},
+            labels: [{% for i in data.or_key %} '{{ i }}', {% endfor %}],
             datasets: [{
               label: "遗忘率",
               lineTension: 0.3,
@@ -406,7 +406,7 @@
               pointHoverBorderColor: "rgba(78, 115, 223, 1)",
               pointHitRadius: 10,
               pointBorderWidth: 2,
-              data: {{ data.or_data }},
+              data: [{% for i in data.or_data %} '{{ i }}', {% endfor %}],
             }],
           },
           options: {
@@ -488,13 +488,13 @@
         var myBarChart = new Chart(dtx, {
           type: 'bar',
           data: {
-            labels: {{ data.study_number_key }},
+              labels:[{% for i in data.study_number_key %} '{{ i }}', {% endfor %}],
             datasets: [{
               label: "数量",
               backgroundColor: "#4e73df",
               hoverBackgroundColor: "#2e59d9",
               borderColor: "#4e73df",
-              data: {{ data.study_number_data }},
+              data: [{% for i in data.study_number_data %} '{{ i }}', {% endfor %}],
             }],
           },
           options: {

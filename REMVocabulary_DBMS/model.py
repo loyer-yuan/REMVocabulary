@@ -1,8 +1,5 @@
 import hashlib
 import os
-
-import pymysql
-
 from tool.MySQLConn import MyPymysql
 import datetime
 
@@ -121,11 +118,6 @@ def loginDo(user):
                           'and update_time = '
                           '(select max(update_time) from check_in_form where username = %s);', [username, username])
     # 如果不存在记录，也就是第一次登录
-    if debug:
-        print("展示签到最近记录：username: " + target[1]
-              + "\tid: " + str(target[0])
-              + "\tconsecutive_check: " + str(target[2])
-              + "\tupdate_time: " + str(target[3]))
     if not target:
         # 创建新的纪录， id从0开始
         state = mysql.insert('insert into check_in_form(id, username, consecutive_check) '
@@ -153,7 +145,9 @@ def loginDo(user):
     else:
         # 已经有了记录, 判断是否是昨天的记录
         today = datetime.datetime.today()
-        diff = int((today.day - target[3].day))
+        diff = (today.date() - target[3].date()).days
+        if debug:
+            print("Today is " + str(today) + " diff is " + str(diff))
         if diff == 1:
             # 是昨天的记录， 在昨天的记录上consecutive_check+1
             if debug:
@@ -255,7 +249,7 @@ def getDataOfIndex(user):
         total_num = mysql.getOne("select count(words) from word_book "
                                  "where word_book = %s and username = %s;", [book_name, username])
         study_word_num = mysql.getOne("select count(words) from word_book "
-                                      "where word_book = %s and username = %s and degree <> 'not learning';"
+                                      "where word_book = %s and username = %s and degree = 'finished';"
                                       , [book_name, username])
         # 计算进度，并且换算成百分制
         progress = '0'
@@ -311,13 +305,14 @@ def getDataOfIndex(user):
 
     # 取出平均学习单词的数量
     total_study_num = mysql.getOne('select study_number from remember_word where username = %s;', [username])
-    register_time = mysql.getOne('select register_time from user where username = %s;', [username])
-    timedelta = int(datetime.datetime.now().day - register_time[0].day)
-    avg_study = '0'
-    if timedelta == 0:
-        data['avg_study'] = avg_study
-    else:
-        avg_study = format(total_study_num[0] / timedelta, '.2f')
+    # register_time = mysql.getOne('select register_time from user where username = %s;', [username])
+    # timedelta = (datetime.datetime.now().date() - register_time[0].date()).days
+    # avg_study = '0'
+    # if timedelta == 0:
+    #     data['avg_study'] = avg_study
+    # else:
+    #     avg_study = format(total_study_num[0] / timedelta, '.2f')
+    avg_study = format(total_study_num[0] / int(add_check[0]), '.2f')
     if debug:
         print("取出平均学习单词的数量: " + avg_study)
     data['avg_study'] = avg_study
@@ -325,10 +320,11 @@ def getDataOfIndex(user):
     # 取出平均复习单词的数量
     total_preview_num = mysql.getOne('select preview_number from remember_word where username = %s;', [username])
     avg_preview = '0'
-    if timedelta == 0:
-        data['avg_preview'] = avg_preview
-    else:
-        avg_preview = format(total_preview_num[0] / timedelta, '.2f')
+    # if timedelta == 0:
+    #     data['avg_preview'] = avg_preview
+    # else:
+    #     avg_preview = format(total_preview_num[0] / timedelta, '.2f')
+    avg_preview = format(total_preview_num[0] / int(add_check[0]), '.2f')
     if debug:
         print("取出平均复习单词的数量: " + avg_preview)
     data['avg_preview'] = avg_preview
@@ -412,11 +408,13 @@ def word_book_to_sql(file_name):
     True - 成功插入
     """
     # 获取文件位置
-    target = os.path.join(os.getcwd()+r"\word_book", file_name)
+    target = os.path.join(os.getcwd() + r"\word_book", file_name)
     # 去掉后缀名
     book = file_name.split(".")[0]
     # 获取用户名
     username = book.split("_")[0]
+    if debug:
+        print("book: " + book + " username: " + username)
     # 去掉用户名
     book = book.split("_")[1]
     mysql = MyPymysql()
@@ -435,10 +433,15 @@ def word_book_to_sql(file_name):
             for data in data_set:
                 # 全部小写
                 data = str.lower(data)
+                # 查找有无单词
+                result = mysql.getOne("select words from vocabulary where words = %s;", [data])
+                if not result:
+                    print("没有该单词： " + data)
                 mysql.insert(sql, [data, book, username])
         # 结束事务
         mysql.end("commit")
     except:
+        mysql.end("rollback")
         mysql.dispose()
         return False
     if debug:
@@ -509,3 +512,437 @@ def get_current_book(user):
                         "where username = %s;", [username])
     mysql.dispose()
     return book
+
+
+def check_temp_book(user, flag):
+    """
+    判断temp_book内单词的数量，补充单词，每天第一次登陆时才执行
+    :return True - 正常执行流程
+            False - 用户没有指定单词本学习，不正常退出
+    """
+    username = user['username']
+    mysql = MyPymysql()
+
+    # 获取最近一次的登录时间
+    login_time = mysql.getOne(
+        'select update_time from check_in_form where username = %s '
+        'and update_time = '
+        '(select max(update_time) from check_in_form where username = %s);', [username, username])
+    today = datetime.datetime.today()
+    # 计算距离最近一次的登陆时间为多少
+    diff = (today.date() - login_time[0].date()).days
+    # 如果是今天登录
+    if diff == 0 and flag:
+        return True
+
+    # 如果今天没有登录，开始事务
+    mysql.begin()
+    # 获取用户的当前学习的单词本
+    word_book = mysql.getOne("select word_book from remember_word where username = %s;", [username])
+    word_book = word_book[0]
+    if debug:
+        print()
+        if word_book is None:
+            print("当前没有学习的单词本")
+        else:
+            print("当前学习的单词本为： " + word_book)
+    # 用户还没有指定单词本学习
+    if word_book is None:
+        return False
+
+    # 取出复习的单词
+    preview_word_list = []
+    degree = {'f1': 1, 'f2': 2, 'f4': 4, 'f7': 7, 'f15': 15}
+    for i in degree.keys():
+        # 取出f系列等级的单词
+        temp = mysql.getAll("select words, time from word_book "
+                            "where username = %s and word_book = %s and degree = %s;",
+                            [username, word_book, i])
+        if temp:
+            for j in temp:
+                diff_day = (today.date() - j[1].date()).days
+                # 取出当天及更早之前要复习的单词
+                if diff_day >= degree[i]:
+                    preview_word_list.append(j[0])
+
+    count = 0
+    # 将需要复习单词写入temp_book
+    if debug:
+        print()
+        print("写入temp_book复习单词为：")
+    for i in preview_word_list:
+        state = mysql.getOne("select 1 from temp_book "
+                             "where word = %s and word_book = %s and username = %s;", [i, word_book, username])
+        # 如果已经存在，那就不插入
+        if not state:
+            mysql.insert("insert into temp_book(word, word_book, username, degree) "
+                         "values (%s, %s, %s, 'preview');", [i, word_book, username])
+            count += 1
+            if debug:
+                print("单词 " + i + ", 单词本 " + word_book + ", 用户名 " + username)
+    # 更新复习的单词数量
+    mysql.update("update remember_word set preview_number = preview_number+%s "
+                 "where username = %s;", [count, username])
+    mysql.end("commit")
+    if debug:
+        print()
+        print("更新复习的单词的数量： " + str(count))
+
+    # 事务再次开始
+    mysql.begin()
+    # 取需要学习的单词
+    study_word_list = []
+    # 查看temp_book内已经有的单词数量，是否达到一天所要学习的数量
+    exist_number = mysql.getOne("select count(word) from temp_book "
+                                "where username = %s and word_book = %s;",
+                                [username, word_book])
+    exist_number = exist_number[0]
+    # 取规划好的学习量
+    plan_word_num = mysql.getOne("select plan_number from remember_word where username = %s;", [username])
+    plan_word_num = plan_word_num[0]
+    # 需要增加的学习量
+    diff_word_num = 0
+    # 判断用户temp_book的单词数量是否到达学习目标
+    if exist_number < plan_word_num:
+        diff_word_num = plan_word_num - exist_number
+    if debug:
+        print()
+        print("需要增加的学习量为： " + str(diff_word_num))
+    # 不是0
+    if diff_word_num != 0:
+        temp = mysql.getMany("select words from word_book "
+                             "where username = %s and word_book = %s and degree = 'not learning';",
+                             diff_word_num, [username, word_book])
+        if temp:
+            for i in temp:
+                study_word_list.append(i[0])
+    if debug:
+        print()
+        print("写入temp_book的学习的单词为：")
+    # 将需要学习的单词写入temp_book
+    for i in study_word_list:
+        state = mysql.getOne("select 1 from temp_book "
+                             "where word = %s and word_book = %s and username = %s;", [i, word_book, username])
+        # 如果已经存在，那就不插入
+        if not state:
+            mysql.insert("insert into temp_book(word, word_book, username, degree) "
+                         "values (%s, %s, %s, 'study');", [i, word_book, username])
+            if debug:
+                print("单词 " + i + ", 单词本 " + word_book + ", 用户名 " + username)
+    mysql.end("commit")
+
+    count_all = mysql.getOne("select count(distinct word) from temp_book "
+                             "where username = %s and word_book = %s;", [username, word_book])
+    if count_all:
+        count_all = count_all[0]
+        mysql.update("update remember_word "
+                     "set temp_num = %s "
+                     "where username = %s;", [count_all, username])
+    mysql.dispose()
+    return True
+
+
+def get_word_list(user):
+    """
+    从temp_book获取需要背诵的单词组
+    """
+    username = user['username']
+    mysql = MyPymysql()
+    # 获取用户的当前学习的单词本
+    word_book = mysql.getOne("select word_book from remember_word where username = %s;", [username])
+    word_book = word_book[0]
+
+    # 结算一轮走完的所有情况
+    mysql.begin()
+    mysql.update("update temp_book "
+                 "set list = list-1 "
+                 "where username = %s and word_book = %s and list = '1';", [username, word_book])
+    mysql.update("update temp_book "
+                 "set list = list-1 "
+                 "where username = %s and word_book = %s and list = '2';", [username, word_book])
+    mysql.end("commit")
+
+    # 事务开始
+    mysql.begin()
+    word_list = []
+    # 查找有没有需要复习的单词
+    temp = mysql.getAll("select word from temp_book "
+                        "where username = %s and word_book = %s and degree = 'preview';", [username, word_book])
+    # 如果有需要复习的单词
+    if temp:
+        for i in temp:
+            # 放入session列表中
+            word_list.append([str(i[0]), 'preview2'])
+            # 设置temp_book中degree为preview2，设置list为2
+            mysql.update("update temp_book "
+                         "set degree = 'preview2', list = '2' "
+                         "where username = %s and word_book = %s and word = %s;", [username, word_book, str(i[0])])
+    else:
+        # 取出<=7个study类型的单词
+        temp = mysql.getMany("select word from temp_book "
+                             "where username = %s and word_book = %s and degree = 'study';", 7, [username, word_book])
+        # 存在study的单词
+        if temp:
+            # 将study的单词放入session的word_list中
+            for i in temp:  # TODO: 检查取单词有无问题
+                word_list.append([str(i[0]), 'study'])
+            temp = mysql.getAll("select word, degree from temp_book "
+                                "where username = %s and word_book = %s and list = '0';", [username, word_book])
+            # 将所有要复习的单词放入session的word_list中
+            if temp:
+                for i in temp:
+                    word_list.append([str(i[0]), str(i[1])])
+        # 不存在study的单词
+        else:
+            temp = mysql.getAll("select word, degree from temp_book "
+                                "where username = %s and word_book = %s and list is not null;", [username, word_book])
+            if temp:
+                for i in temp:
+                    word_list.append([str(i[0]), str(i[1])])
+    mysql.end("commit")
+    mysql.dispose()
+    if debug:
+        print("session中的单词为：")
+        for i in word_list:
+            print("{0}: {1}".format(i[0], i[1]))
+    if not word_list:
+        if debug:
+            print("已经背完单词")
+        return False
+    return word_list
+
+
+def increase_study_number(user):
+    """
+     更新当前用户的remember_word的study_number+1
+    """
+    username = user['username']
+    mysql = MyPymysql()
+    state = mysql.update("update remember_word "
+                         "set study_number = study_number+1 "
+                         "where username = %s;", [username])
+    if debug:
+        print("更新用户 " + username + " 的study_number +1，数据库影响行数为" + str(state))
+    mysql.dispose()
+
+
+def increase_remember_number(user):
+    """
+    更新oblivion的remember_number+1
+    """
+    username = user['username']
+    mysql = MyPymysql()
+    state = mysql.update("update oblivion "
+                         "set remember_number = remember_number+1 "
+                         "where username = %s;", [username])
+    if debug:
+        print("更新用户 " + username + " 的remember_number +1，数据库影响行数为" + str(state))
+    mysql.dispose()
+
+
+def get_word_data(word, degree):
+    """
+    获取单词的相应程度的数据，不同程度的，有不同种类和数量的数据
+    :param word: 需要查找的单词
+    :param degree: 对应的程度 分别有[study, detail, preview, after_preview]
+    :return: dict, 包含相应的数据集
+        'type' == 'study':
+            'word':
+            'examples': (list)
+        'type' == 'detail'/'after_preview':
+            'word':
+            'pronounce':
+            'chineses': (list）
+                {'part_of_speech', 'chinese'}
+            'examples': (list)
+                {'example', 'chinese'}
+        'type' == 'preview':
+            'chineses': (list）
+                {'part_of_speech', 'chinese'}
+            'examples': (list)
+                {'example', 'chinese'} 去掉需要填写的单词
+    """
+    mysql = MyPymysql()
+
+    # 取音标
+    pronounce = ""
+    temp = mysql.getAll("select pronounce from pronounce where words = %s;", [word])
+    if temp:
+        for i in temp:
+            pronounce += i[0] + "   "
+
+    # 取中文释义
+    chineses = []
+    temp = mysql.getAll("select part_of_speech, chinese "
+                        "from vocabulary "
+                        "where words = %s;", [word])
+    if temp:
+        for i in temp:
+            chineses.append({'part_of_speech': i[0], 'chinese': i[1]})
+
+    # 取例句，最多10个
+    examples = []
+    temp = mysql.getMany("select example, chinese "
+                         "from example "
+                         "where words = %s;", 10, [word])
+    if temp:
+        for i in temp:
+            examples.append({'example': i[0], 'chinese': i[1]})
+
+    # 根据degree，打包信息
+    data = {}
+    if degree == "study":
+        es = []
+        for i in examples:
+            es.append(i['example'])
+        data = {'word': word,
+                'examples': es}
+    if degree == "detail" or degree == "after_preview":
+        data = {'word': word,
+                'pronounce': pronounce,
+                'chineses': chineses,
+                'examples': examples}
+    if degree == "preview":
+        ex1 = []
+        for i in examples:
+            example = i['example']
+            example = example.replace(word, "_____")
+            example = example.replace(word[0].upper() + word[1:], "_____")
+            example = example.replace(word.upper(), "_____")
+            ex1.append({'example': example, 'chinese': i['chinese']})
+        data = {'chineses': chineses,
+                'examples': ex1}
+    mysql.dispose()
+    if debug:
+        print()
+        print("发送给study页面的data数据包为：")
+        for i, j in data.items():
+            print(str(i) + ": " + str(j))
+    return data
+
+
+def get_study_progress(user):
+    """
+    获取当前用户，当天学习的学习进度
+    """
+    username = user['username']
+    mysql = MyPymysql()
+    # 获取用户的当前学习的单词本
+    word_book = mysql.getOne("select word_book from remember_word where username = %s;", [username])
+    word_book = word_book[0]
+
+    plan_num = mysql.getOne("select temp_num from remember_word "
+                            "where username = %s;", [username])
+    if type(plan_num) != "NoneType":
+        plan_num = int(plan_num[0])
+        study_num = mysql.getOne("select count(word) from temp_book "
+                                 "where username = %s and word_book = %s;", [username, word_book])
+        study_num = int(study_num[0])
+        progress = (1 - study_num / plan_num) * 100
+    else:
+        progress = 0
+
+    mysql.dispose()
+    return str(int(progress))
+
+
+def delete_word_in_temp_book(user, word):
+    """
+    删除temp_book中的某个单词
+    """
+    username = user['username']
+    mysql = MyPymysql()
+    # 获取用户的当前学习的单词本
+    word_book = mysql.getOne("select word_book from remember_word where username = %s;", [username])
+    word_book = word_book[0]
+
+    mysql.delete("delete from temp_book "
+                 "where username = %s and word_book = %s and word = %s;",
+                 [username, word_book, word])
+    if debug:
+        print()
+        print("删除用户: " + username + "temp_book的单词 " + word)
+    mysql.dispose()
+
+
+def update_word_in_table(user, table, word, operate):
+    """
+    更新单词在相应的表中的等级
+    :param user: 用户
+    :param table: 相应的表格，比如：temp_book, word_book
+    :param word: 需要更新的单词
+    :param operate: 需要更新的操作，'up', 'down', 'f1', 'finished', 'preview1', 'preview2'
+    :return: None
+    """
+    degrees = ()
+    if table == 'word_book':
+        degrees = ('not learning', 'f1', 'f2', 'f4', 'f7', 'f15', 'finished')
+    if table == 'temp_book':
+        degrees = ('study', 'preview1', 'preview2')
+    username = user['username']
+    mysql = MyPymysql()
+    # 获取用户的当前学习的单词本
+    word_book = mysql.getOne("select word_book from remember_word where username = %s;", [username])
+    word_book = word_book[0]
+
+    if table == 'word_book':
+        # 获取当前单词的degree
+        degree = mysql.getOne("select degree from word_book "
+                              "where username = %s and word_book = %s and words = %s;",
+                              [username, word_book, word])
+        degree = degree[0]
+        if operate == 'up':
+            index = degrees.index(degree)
+            mysql.update("update word_book "
+                         "set degree = %s "
+                         "where username = %s and word_book = %s and words = %s;",
+                         [degrees[index+1], username, word_book, word])
+        if operate == 'down':
+            index = degrees.index(degree)
+            if index == 0:
+                return
+            mysql.begin()
+            if index == 1:
+                mysql.update("update word_book "
+                             "set degree = 'f1' "
+                             "where username = %s and word_book = %s and words = %s;",
+                             [username, word_book, word])
+            elif index > 1:
+                mysql.update("update word_book "
+                             "set degree = %s "
+                             "where username = %s and word_book = %s and words = %s;",
+                             [degrees[index - 1], username, word_book, word])
+            mysql.update("update oblivion "
+                         "set forget_number = forget_number+1 "
+                         "where username = %s;", [username])
+            mysql.end("commit")
+        if operate == 'f1':
+            index = degrees.index(degree)
+            if index == 0:
+                return
+            mysql.begin()
+            mysql.update("update word_book "
+                         "set degree = 'f1' "
+                         "where username = %s and word_book = %s and words = %s;",
+                         [username, word_book, word])
+            mysql.update("update oblivion "
+                         "set forget_number = forget_number+1 "
+                         "where username = %s;", [username])
+            mysql.end("commit")
+        if operate == 'finished':
+            mysql.update("update word_book "
+                         "set degree = 'finished' "
+                         "where username = %s and word_book = %s and words = %s;",
+                         [username, word_book, word])
+    if table == 'temp_book':
+        if operate == 'preview1':
+            mysql.update("update temp_book "
+                         "set degree = 'preview1', list = '1' "
+                         "where username = %s and word_book = %s and word = %s;",
+                         [username, word_book, word])
+        if operate == 'preview2':
+            mysql.update("update temp_book "
+                         "set degree = 'preview2', list = '2' "
+                         "where username = %s and word_book = %s and word = %s;",
+                         [username, word_book, word])
+    mysql.dispose()

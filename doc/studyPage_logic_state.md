@@ -28,7 +28,7 @@ degree： study，preview1, preview2，preview
   - 执行下一步操作
 
 ## 注： session列表元素格式
-{'单词': 'study/preview1/preview2/repeat'}
+['单词', 'study/preview1/preview2/repeat']
 
 ## 3. 判断session中列表是否存在元素（取一组数据）
 - 存在，执行下一步操作
@@ -38,7 +38,7 @@ degree： study，preview1, preview2，preview
     并设置temp_book中degree为preview2，设置list为2，session列表设置为preview2，然后执行下一步操作
     - 如果没有，判断有无study的单词
       - 如果没有，则全部取出，放入session中
-      - 如果有，则取出7个study的单词，再取出所有degree为0的单词，放入session中，按顺序，study在前
+      - 如果有，则取出7个study的单词，再取出所有list为0的单词，放入session中，按顺序，study在前
     - 执行下一步操作
 
 ## 4. 从列表中抽单词出来学习直到列表为空
