@@ -12,18 +12,6 @@ from REMVocabulary_DBMS.model import *
 """
 debug = True
 
-
-def test(request):
-    """
-    Show base.html
-    """
-    if 'user' not in request.session:
-        return HttpResponseRedirect('/login/')
-    user = request.session['user']
-    context = {'user': user}
-    return render(request, 'base.html', context)
-
-
 def register(request):
     """
     help user register
