@@ -1,7 +1,7 @@
 import hashlib
 import os
 from tool.MySQLConn import MyPymysql
-import datetime
+import datetime, math
 
 debug = True
 # default data
@@ -148,6 +148,9 @@ def loginDo(user):
         diff = (today.date() - target[3].date()).days
         if debug:
             print("Today is " + str(today) + " diff is " + str(diff))
+        # 判断并写入temp_book单词（每天第一次登录时, 更换单词本时）（取一天数据）
+        if diff > 0:  # 不是今天登录
+            check_temp_book(user, True)
         if diff == 1:
             # 是昨天的记录， 在昨天的记录上consecutive_check+1
             if debug:
@@ -256,7 +259,7 @@ def getDataOfIndex(user):
         if total_num[0] == 0:
             data['progress'] = progress
         else:
-            progress = str(int(study_word_num[0] / total_num[0] * 100))
+            progress = str(math.ceil(study_word_num[0] / total_num[0] * 100))
             data['progress'] = progress
         if debug:
             print("数据展示中，单词本进度数据为：")
@@ -424,6 +427,7 @@ def word_book_to_sql(file_name):
           "values (%s, %s, %s);"
 
     # 开始事务
+    error_word = []
     try:
         mysql.begin()
         # 获取文件每一行的单词
@@ -436,18 +440,23 @@ def word_book_to_sql(file_name):
                 # 查找有无单词
                 result = mysql.getOne("select words from vocabulary where words = %s;", [data])
                 if not result:
+                    error_word.append(data)
                     print("没有该单词： " + data)
-                mysql.insert(sql, [data, book, username])
+                else:
+                    mysql.insert(sql, [data, book, username])
         # 结束事务
         mysql.end("commit")
     except:
         mysql.end("rollback")
         mysql.dispose()
-        return False
+        return False, error_word
     if debug:
         print("单词本 " + book + " 插入数据库完成！")
     mysql.dispose()
-    return True
+    if error_word:
+        return False, error_word
+    else:
+        return True, error_word
 
 
 def is_exist_book(username, book_name):
@@ -843,7 +852,7 @@ def get_study_progress(user):
         progress = 0
 
     mysql.dispose()
-    return str(int(progress))
+    return str(math.ceil(progress))
 
 
 def delete_word_in_temp_book(user, word):
@@ -946,3 +955,39 @@ def update_word_in_table(user, table, word, operate):
                          "where username = %s and word_book = %s and word = %s;",
                          [username, word_book, word])
     mysql.dispose()
+
+
+def delete_book(user, book_name):
+    """
+    删除对应的单词本
+    """
+    username = user['username']
+    mysql = MyPymysql()
+
+    mysql.begin()
+    try:
+        temp = get_current_book(user)
+        if temp:
+            if book_name == temp[0]:  # 如果正在学习该单词
+                mysql.update("update remember_word "
+                             "set word_book = null "
+                             "where username = %s;", [username])
+        mysql.delete("delete from temp_book "
+                     "where username = %s and word_book = %s;", [username, book_name])
+        mysql.delete("delete from word_book "
+                     "where username = %s and word_book = %s;", [username, book_name])
+    except:
+        mysql.end("rollback")
+        return False
+    mysql.end("commit")
+    mysql.dispose()
+    return True
+
+
+def is_exist_word(word):
+    mysql = MyPymysql()
+    temp = mysql.getOne("select 1 from vocabulary where words = %s;", [word])
+    if temp:
+        return True
+    else:
+        return False

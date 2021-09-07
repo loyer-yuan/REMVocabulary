@@ -265,8 +265,8 @@ def upload_word_book(request):
         context['error'] = error
         return render(request, 'word_book.html', context)
     # 命名带有下划线
-    if len(book_name.split('_')) > 1:
-        error = '命名不能带有下划线'
+    if len(book_name.split('_')) > 1 or len(book_name.split('.')) > 2:
+        error = '命名不能带有下划线"_"或者"."'
         context['error'] = error
         return render(request, 'word_book.html', context)
     # 上传了同名文件
@@ -288,10 +288,14 @@ def upload_word_book(request):
         print("文件 " + filename + " 写入word_book文件夹完成！")
 
     # 将单词本导入到数据库中
-    isSuccess = word_book_to_sql(filename)
-    if not isSuccess:
+    temp = word_book_to_sql(filename)
+    is_success = temp[0]
+    error_word = temp[1]
+    if not is_success:
         # 插入的单词本有不在单词库的单词
-        error = '插入的单词本有不在单词库的单词，请检查'
+        error = '插入的单词本有不在单词库的单词:'
+        for i in error_word:
+            error += i + ' '
         context['error'] = error
         return render(request, 'word_book.html', context)
     return HttpResponseRedirect('/word_book/')
@@ -536,6 +540,14 @@ def studyPage(request):
             word = word_list[0]
             word = word[0]
             text = request.POST.get('texts')
+            if text == "":  # 没有写单词
+                data = get_word_data(word, 'after_preview')
+                progress = get_study_progress(user)
+                context = {'user': user,
+                           'type': 'after_preview',
+                           'data': data,
+                           'progress': progress}
+                return render(request, 'study.html', context)
             if debug:
                 print()
                 print("输入的单词为： " + text)
@@ -605,3 +617,37 @@ def studyPage(request):
                 request.session['word_list'] = word_list
         return HttpResponseRedirect('/study/')
 
+
+def delete_word_book(request):
+    """
+    删除单词本
+    """
+    user = request.session['user']
+    book = request.POST.get('word_book')
+    result = get_current_book(user)
+    if result:
+        result = result[0]
+        if book == result and 'word_list' in request.session:  # 正在学习当前单词本
+            del request.session['word_list']  # 删除列表
+    if delete_book(user, book):
+        print("成功删除")
+    else:
+        print("不成功删除")
+    return HttpResponseRedirect('/word_book/')
+
+
+def search(request):
+    """
+    搜索单词
+    """
+    user = request.session['user']
+    key = request.GET.get('search')
+    if is_exist_word(key):
+        data = get_word_data(key, 'detail')
+        context = {'user': user,
+                   'data': data}
+        return render(request, 'search.html', context)
+    else:
+        context = {'user': user,
+                   'data': {}}
+        return render(request, 'search.html', context)

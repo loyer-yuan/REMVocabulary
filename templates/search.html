@@ -8,7 +8,7 @@
     <meta name="description" content="DB-design">
     <meta name="author" content="loyer">
 
-    <title>选词 · 学英语</title>
+    <title>搜索 · 学英语</title>
 
     <!-- Custom fonts for this template-->
     <link href="../static/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
@@ -30,7 +30,7 @@
         <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
 
             <!-- Sidebar - Brand -->
-            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="{% url 'index' %}">
+            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="index.html">
                 <div class="sidebar-brand-icon rotate-n-15">
                     <i class="fas fa-laugh-wink"></i>
                 </div>
@@ -61,7 +61,7 @@
             <hr class="sidebar-divider d-none d-md-block">
 
             <!-- 单词本 -->
-            <li class="nav-item active">
+            <li class="nav-item">
                 <a class="nav-link" href="{% url 'word_book' %}">
                     <i class="fas fa-fw fa-folder-open"></i>
                     <span>选词</span></a>
@@ -175,132 +175,84 @@
                 <div class="container-fluid">
                     <!-- Page Heading -->
                     <div class="d-sm-flex align-items-center justify-content-between mb-4">
-                        <h1 class="h3 mb-0 text-gray-800">选词</h1>
-                    </div>
-
-                    <div class="d-sm-flex align-items-center justify-content-between mb-2">
-                        <h3 class="h3 mb-0 text-secondary">当前单词本</h3>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-lg-6">
-                            {% if current_book %}
-                            <div class="card mb-4 py-3 border-bottom-danger">
-                                <div class="card-body">
-                                    <h4 class="h4 mb-0" >{{ current_book }}</h4>
-                                </div>
-                            </div>
-                            {% else %}
-                            <div class="card mb-4 py-3 border-bottom-danger">
-                                <div class="card-body">
-                                    快去选个单词本吧~
-                                </div>
-                            </div>
-                            {% endif %}
-                        </div>
-
-                        <!-- 上传 -->
-                        <div class="col-lg-3"></div>
-                        <div class="col-lg-3">
-                            <form enctype="multipart/form-data" action="/upload_word_book/" method="POST">
-                                {% csrf_token %}
-                                <input type="hidden" name="username" value="{{ user.username }}" />
-                                <input type="file" class="btn" name="word_book" required />
-                                <input type="submit" class="btn btn-info mb-4 py-2" value= "上传单词本" />
-                            </form>
-                            <strong>{{ error }}</strong>
-                        </div>
-
+                        <h3 class="h3 mb-0 text-gray-800">搜索</h3>
                     </div>
 
                     <!-- 分界线 -->
                     <hr class="sidebar-divider d-none d-md-block">
 
-                    <div class="d-sm-flex align-items-center justify-content-between mb-2">
-                        <h3 class="h3 mb-0 text-secondary">其他单词本</h3>
-                    </div>
-
                     <div class="row">
-                        <!-- 一列 -->
-                        <div class="col-lg-6">
-                            {% for book in left_book_list %}
-                            <!-- 选择的单词本 -->
-                            <div class="row">
-                                <div class="col-lg-8">
-                                    <div class="card mb-4 py-3 border-left-success">
-                                        <div class="card-body">
-                                            <h4 class="h4 mb-0" >{{ book }}</h4>
-                                        </div>
+                        <!-- 显示详细单词的页面 -->
+                        <div class="col-lg-8">
+                        {% if data %}
+                            <!-- 单词 -->
+                            <div class="card shadow mb-4">
+                                <!-- Card Header - Accordion -->
+                                <a href="#collapseCardExample" class="d-block card-header py-3" data-toggle="collapse" role="button" aria-expanded="true" aria-controls="collapseCardExample">
+                                    <h6 class="m-0 font-weight-bold text-primary">单词</h6>
+                                </a>
+                                <!-- Card Content - Collapse -->
+                                <div class="collapse show" id="collapseCardExample">
+                                    <div class="card-body">
+                                        <h2 class="h2 text-gray-900">{{ data.word }}</h2>
+                                        <h4 class="h4 text-gray-500">{{ data.pronounce }}</h4>
                                     </div>
                                 </div>
-                                <div class="col-lg-2">
-                                    <form action="/select_book/" method="post">
-                                        {% csrf_token %}
-                                        <input type="hidden" name="word_book" value="{{ book }}">
-                                        <input type="submit" class="btn btn-success mb-4 py-2" value= "选择" />
-                                    </form>
-                                    <div class="col-lg-auto"></div>
-                                    <form action="/download_word_book/" method="get">
-                                        {% csrf_token %}
-                                        <input type="hidden" name="word_book" value="{{ book }}">
-                                        <input type="submit" class="btn btn-secondary mb-4 py-2" value= "下载" />
-                                    </form>
-                                </div>
-                                <div class="col-lg-2">
-                                    <form action="/delete_word_book/" method="post">
-                                        {% csrf_token %}
-                                        <input type="hidden" name="word_book" value="{{ book }}">
-                                        <input type="submit" class="btn btn-danger btn-block" value= "删除" />
-                                    </form>
+                            </div>
+
+                            <!-- 释义 -->
+                            <div class="card shadow mb-4">
+                                <!-- Card Header - Accordion -->
+                                <a href="#collapseCardExample" class="d-block card-header py-3" data-toggle="collapse" role="button" aria-expanded="true" aria-controls="collapseCardExample">
+                                    <h6 class="m-0 font-weight-bold text-primary">释义</h6>
+                                </a>
+                                <!-- Card Content - Collapse -->
+                                <div class="collapse show" id="collapseCardExample">
+                                    <div class="card-body">
+                                        {% for i in data.chineses %}
+                                            <div class="card mb-2 py-0 border-left-success">
+                                                <div class="card-body">
+                                                    <span class="h5 text-gray-500">{{ i.part_of_speech }}</span>
+                                                    <span class="h4 text-gray-700">{{ i.chinese }}</span>
+                                                </div>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
                                 </div>
                             </div>
-                            {% empty %}
-                                <h4 class="h4 mb-0 text-gray-500">这里空空如也~</h4>
-                            {% endfor %}
 
-
+                            <!-- 英文例句 -->
+                            <div class="card shadow mb-4">
+                            <!-- Card Header - Accordion -->
+                            <a href="#collapseCardExample" class="d-block card-header py-3" data-toggle="collapse" role="button" aria-expanded="true" aria-controls="collapseCardExample">
+                                <h6 class="m-0 font-weight-bold text-primary">例句</h6>
+                            </a>
+                            <!-- Card Content - Collapse -->
+                            <div class="collapse show" id="collapseCardExample">
+                                <div class="card-body">
+                                    {% for i in data.examples %}
+                                        <div class="card mb-2 py-0 border-left-success">
+                                            <div class="card-body">
+                                                <p class="h5 text-gray-700">{{ i.example }}</p>
+                                                <p class="h5 text-gray-500">{{ i.chinese }}</p>
+                                            </div>
+                                        </div>
+                                    {% empty %}
+                                        <div class="card mb-2 py-0 border-left-success">
+                                            <div class="card-body">
+                                                <p class="h5 text-gray-700">暂时没有例句~</p>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
                         </div>
-
-                        <!-- 一列 -->
-                        <div class="col-lg-6">
-                            {% for book in right_book_list %}
-                            <!-- 选择的单词本 -->
-                            <div class="row">
-                                <div class="col-lg-8">
-                                    <div class="card mb-4 py-3 border-left-warning">
-                                        <div class="card-body">
-                                            <h4 class="h4 mb-0" >{{ book }}</h4>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-lg-2">
-                                    <form action="/select_book/" method="post">
-                                        {% csrf_token %}
-                                        <input type="hidden" name="word_book" value="{{ book }}">
-                                        <input type="submit" class="btn btn-warning mb-4 py-2" value= "选择" />
-                                    </form>
-                                    <div class="col-lg-auto"></div>
-                                    <form action="/download_word_book/" method="get">
-                                        {% csrf_token %}
-                                        <input type="hidden" name="word_book" value="{{ book }}">
-                                        <input type="submit" class="btn btn-secondary mb-4 py-2" value= "下载" />
-                                    </form>
-                                </div>
-                                <div class="col-lg-2">
-                                    <form action="/delete_word_book/" method="post">
-                                        {% csrf_token %}
-                                        <input type="hidden" name="word_book" value="{{ book }}">
-                                        <input type="submit" class="btn btn-danger btn-block" value= "删除" />
-                                    </form>
-                                </div>
-                            </div>
-                            {% endfor %}
-
+                        {% else %}
+                            <h2 class="h2 text-gray-900">很遗憾，没有找到单词...</h2>
+                        {% endif %}
                         </div>
                     </div>
-
                 </div>
-
             </div>
             <!-- End of Main Content -->
 
