@@ -38,3 +38,31 @@
 ## 特殊模块
 1. 通过导入txt英文文本，识别里面的单词，然后爬取bing的单词库，制作属于自己的单词库和单词记忆列表。
 2. 搜索单词
+
+
+---
+## 登录
+![alt login](pic/login.png)
+## 注册
+![alt register](pic/register1.png)
+![alt register](pic/register2.png)
+## 数据展示
+![alt register](pic/index1.png)
+![alt register](pic/index2.png)
+![alt register](pic/index3.png)
+![alt register](pic/index4.png)
+![alt register](pic/index5.png)
+## 学习的页面
+![alt register](pic/study1.png)
+![alt register](pic/study2.png)
+![alt register](pic/study3.png)
+![alt register](pic/study4.png)
+![alt register](pic/study5.png)
+![alt register](pic/study6.png)
+## 复习的页面
+![alt register](pic/preview1.png)
+![alt register](pic/preview2.png)
+![alt register](pic/preview3.png)
+![alt register](pic/preview4.png)
+![alt register](pic/preview5.png)
+![alt register](pic/preview6.png)
