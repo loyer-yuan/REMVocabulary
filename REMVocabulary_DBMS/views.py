@@ -27,7 +27,7 @@ def register(request):
         if result > 0:
             context = {}
             if result == 1:
-                context = {'error': '该邮箱已经被注册过'}
+                context = {'error': '该用户名已经被注册过'}
             if result == 2:
                 context = {'error': '两次输入的密码不一致'}
             if result == 3:
@@ -104,7 +104,7 @@ def logout(request):
     # 删除session
     if 'user' in request.session:
         del request.session['user']
-    # request.session.flush()  # 删除所有的session
+    request.session.flush()  # 删除所有的session
     resp = HttpResponseRedirect('/login/')
     # 删除cookie
     if 'user' in request.COOKIES:
@@ -412,7 +412,7 @@ def studyPage(request):
 
     # 3. 判断session中，是否存在列表
     if 'word_list' not in request.session:
-        request.session['word_list'] = get_word_list(user)
+        request.session['word_list'] = []
 
     word_list = request.session['word_list']
 
@@ -424,7 +424,7 @@ def studyPage(request):
                        'type': 'finish',
                        'progress': '100'}
             return render(request, 'study.html', context)
-        request.session['word_list'] = get_word_list(user)
+        request.session['word_list'] = word_list
 
     if debug:
         print()
@@ -563,7 +563,6 @@ def studyPage(request):
                 update_word_in_table(user, 'word_book', word, 'up')
                 increase_remember_number(user)
             if degree == 'preview1':
-                delete_word_in_temp_book(user, word)
                 update_word_in_table(user, 'temp_book', word, 'preview2')
 
         if the_type == "after_preview":
@@ -582,7 +581,6 @@ def studyPage(request):
                         update_word_in_table(user, 'word_book', word, 'up')
                         increase_remember_number(user)
                     if degree == 'preview1':
-                        delete_word_in_temp_book(user, word)
                         update_word_in_table(user, 'temp_book', word, 'preview2')
 
                 if choice == '1' or choice == '2':

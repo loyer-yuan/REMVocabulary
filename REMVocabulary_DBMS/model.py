@@ -295,7 +295,7 @@ def getDataOfIndex(user):
     data['consecutive_check'] = str(consecutive_check)
 
     # 取出总签到数
-    add_check = mysql.getOne('select count(consecutive_check) from check_in_form where username = %s;', [username])
+    add_check = mysql.getOne('select sum(consecutive_check) from check_in_form where username = %s;', [username])
     if debug:
         print("取出总签到数: " + str(add_check[0]))
     data['add_check'] = str(add_check[0])
@@ -442,6 +442,7 @@ def word_book_to_sql(file_name):
                 if not result:
                     error_word.append(data)
                     print("没有该单词： " + data)
+                    raise Exception
                 else:
                     mysql.insert(sql, [data, book, username])
         # 结束事务
@@ -662,14 +663,14 @@ def get_word_list(user):
     word_book = word_book[0]
 
     # 结算一轮走完的所有情况
-    mysql.begin()
+    # mysql.begin()
     mysql.update("update temp_book "
                  "set list = list-1 "
                  "where username = %s and word_book = %s and list = '1';", [username, word_book])
     mysql.update("update temp_book "
                  "set list = list-1 "
                  "where username = %s and word_book = %s and list = '2';", [username, word_book])
-    mysql.end("commit")
+    # mysql.end("commit")
 
     # 事务开始
     mysql.begin()
